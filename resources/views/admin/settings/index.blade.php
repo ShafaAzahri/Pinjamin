@@ -3,7 +3,7 @@
 @section('title', 'Pengaturan')
 
 @section('content')
-<div class="max-w-2xl space-y-6">
+<div class="w-full space-y-6">
     <div>
         <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Pengaturan Sistem</h2>
         <p class="text-sm text-slate-500 mt-1">Konfigurasi global untuk sistem peminjaman</p>

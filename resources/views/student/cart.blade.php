@@ -3,7 +3,7 @@
 @section('title', 'Keranjang')
 
 @section('content')
-<div class="max-w-3xl mx-auto space-y-6">
+<div class="w-full space-y-6">
     <div>
         <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Keranjang Peminjaman</h2>
         <p class="text-sm text-slate-500 mt-1">Review barang sebelum mengajukan peminjaman</p>

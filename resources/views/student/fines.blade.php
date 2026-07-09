@@ -3,7 +3,7 @@
 @section('title', 'Denda Saya')
 
 @section('content')
-<div class="max-w-3xl mx-auto space-y-6">
+<div class="w-full space-y-6">
     <div>
         <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Denda Saya</h2>
         <p class="text-sm text-slate-500 mt-1">Kelola dan bayar denda peminjaman Anda</p>
