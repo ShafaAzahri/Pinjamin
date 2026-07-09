@@ -95,16 +95,19 @@ class CatalogController extends Controller
 
         $maxItems    = (int) (Setting::where('key', 'max_items_borrowed')->first()?->value ?? 3);
         $maxDuration = (int) (Setting::where('key', 'max_loan_duration')->first()?->value ?? 8);
+        $maxDurationType = Setting::where('key', 'max_loan_duration_type')->first()?->value ?? 'hours';
 
         if (count($request->item_unit_ids) > $maxItems) {
             return response()->json(['message' => "Maksimal {$maxItems} barang dapat dipinjam sekaligus."], 422);
         }
 
-        // Convert requested duration to hours for max check
+        // Convert both to hours for comparison
         $requestedHours = $request->loan_duration_type === 'days' ? $request->loan_duration * 24 : $request->loan_duration;
+        $maxHours       = $maxDurationType === 'days' ? $maxDuration * 24 : $maxDuration;
 
-        if ($requestedHours > $maxDuration) {
-            return response()->json(['message' => "Total durasi peminjaman maksimal {$maxDuration} jam."], 422);
+        if ($requestedHours > $maxHours) {
+            $maxLabel = $maxDuration . ' ' . ($maxDurationType === 'days' ? 'hari' : 'jam');
+            return response()->json(['message' => "Total durasi peminjaman maksimal {$maxLabel}."], 422);
         }
 
         // Check for active loans

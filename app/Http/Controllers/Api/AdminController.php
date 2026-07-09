@@ -394,13 +394,14 @@ class AdminController extends Controller
     public function updateSettings(Request $request)
     {
         $request->validate([
-            'max_loan_duration'  => 'sometimes|integer|min:1',
-            'fine_amount'        => 'sometimes|integer|min:0',
-            'fine_type'          => 'sometimes|in:per_hour,per_day',
-            'max_items_borrowed' => 'sometimes|integer|min:1',
+            'max_loan_duration'      => 'sometimes|integer|min:1',
+            'max_loan_duration_type' => 'sometimes|in:hours,days',
+            'fine_amount'            => 'sometimes|integer|min:0',
+            'fine_type'              => 'sometimes|in:per_hour,per_day',
+            'max_items_borrowed'     => 'sometimes|integer|min:1',
         ]);
 
-        foreach ($request->only(['max_loan_duration', 'fine_amount', 'fine_type', 'max_items_borrowed']) as $key => $value) {
+        foreach ($request->only(['max_loan_duration', 'max_loan_duration_type', 'fine_amount', 'fine_type', 'max_items_borrowed']) as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 

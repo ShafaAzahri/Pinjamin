@@ -17,11 +17,14 @@
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Durasi Peminjaman Maksimal</label>
                 <div class="flex items-center gap-3">
-                    <input type="number" name="max_loan_duration" value="{{ $settings['max_loan_duration']->value ?? 8 }}" min="1" max="72" required
+                    <input type="number" name="max_loan_duration" value="{{ $settings['max_loan_duration']->value ?? 8 }}" min="1" required
                         class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition @error('max_loan_duration') border-red-400 @enderror">
-                    <span class="text-sm text-slate-500 font-medium">jam</span>
+                    <select name="max_loan_duration_type" class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition @error('max_loan_duration_type') border-red-400 @enderror">
+                        <option value="hours" {{ ($settings['max_loan_duration_type']->value ?? 'hours') === 'hours' ? 'selected' : '' }}>Jam</option>
+                        <option value="days" {{ ($settings['max_loan_duration_type']->value ?? 'hours') === 'days' ? 'selected' : '' }}>Hari</option>
+                    </select>
                 </div>
-                <p class="text-xs text-slate-400 mt-1">{{ $settings['max_loan_duration']->description ?? '' }}</p>
+                <p class="text-xs text-slate-400 mt-1">{{ $settings['max_loan_duration']->description ?? 'Batas waktu peminjaman maksimal yang bisa diajukan mahasiswa' }}</p>
                 @error('max_loan_duration') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
