@@ -103,9 +103,9 @@ class LoanController extends Controller
     }
 
     /**
-     * Upload payment proof for a fine.
+     * Get Midtrans Snap Token for a fine.
      */
-    public function uploadPaymentProof(Request $request, Fine $fine)
+    public function getSnapToken(Request $request, Fine $fine)
     {
         // Security: verify fine belongs to this user
         if ($fine->loan->user_id !== Auth::id()) {
@@ -113,22 +113,43 @@ class LoanController extends Controller
         }
 
         if ($fine->status !== 'belum_dibayar') {
-            return back()->with('error', 'Denda ini tidak dalam status belum dibayar.');
+            return response()->json(['error' => 'Denda ini tidak dalam status belum dibayar.'], 400);
         }
 
-        $request->validate([
-            'payment_proof' => 'required|file|max:2048',
-        ], [
-            'payment_proof.required' => 'Bukti pembayaran wajib diunggah.',
-        ]);
+        // If snap token already exists, just return it
+        if ($fine->snap_token) {
+            return response()->json(['snap_token' => $fine->snap_token]);
+        }
 
-        $path = $request->file('payment_proof')->store('payment_proofs', 'public');
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = config('midtrans.server_key');
+        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        \Midtrans\Config::$isProduction = config('midtrans.is_production');
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
 
-        $fine->update([
-            'payment_proof_photo' => $path,
-            'status'              => 'menunggu_verifikasi',
-        ]);
+        $params = array(
+            'transaction_details' => array(
+                'order_id' => 'FINE-' . $fine->id . '-' . time(),
+                'gross_amount' => $fine->amount,
+            ),
+            'customer_details' => array(
+                'first_name' => Auth::user()->name,
+                'email' => Auth::user()->email,
+            ),
+        );
 
-        return back()->with('success', 'Bukti pembayaran berhasil diunggah! Menunggu verifikasi Admin.');
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            
+            // Save snap token to fine
+            $fine->update(['snap_token' => $snapToken]);
+
+            return response()->json(['snap_token' => $snapToken]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 }

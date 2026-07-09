@@ -31,24 +31,49 @@
                 </div>
 
                 @if($fine->status === 'belum_dibayar')
-                    <div class="pt-3 border-t border-slate-50">
-                        <button @click="showUpload = !showUpload" class="px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 shadow-sm transition">
-                            Upload Bukti Pembayaran
+                    <div class="pt-3 border-t border-slate-50" x-data="{ loading: false }">
+                        <button 
+                            @click="
+                                loading = true;
+                                fetch('{{ route('student.fines.snap-token', $fine) }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    loading = false;
+                                    if (data.snap_token) {
+                                        window.snap.pay(data.snap_token, {
+                                            onSuccess: function(result){
+                                                window.location.reload();
+                                            },
+                                            onPending: function(result){
+                                                alert('Menunggu pembayaran Anda!');
+                                            },
+                                            onError: function(result){
+                                                alert('Pembayaran gagal!');
+                                            },
+                                            onClose: function(){
+                                                console.log('User closed popup');
+                                            }
+                                        });
+                                    } else {
+                                        alert(data.error || 'Terjadi kesalahan saat memproses pembayaran.');
+                                    }
+                                })
+                                .catch(err => {
+                                    loading = false;
+                                    alert('Kesalahan jaringan.');
+                                });
+                            " 
+                            :disabled="loading"
+                            class="px-4 py-2 bg-teal-600 text-white rounded-xl text-xs font-bold hover:bg-teal-700 shadow-sm transition disabled:opacity-50">
+                            <span x-show="!loading">Bayar via Midtrans</span>
+                            <span x-show="loading">Memproses...</span>
                         </button>
-
-                        <div x-show="showUpload" x-transition class="mt-4">
-                            <form action="{{ route('student.fines.pay', $fine) }}" method="POST" enctype="multipart/form-data" class="flex gap-3 items-end">
-                                @csrf
-                                <div class="flex-1">
-                                    <label class="block text-xs font-semibold text-slate-500 mb-1">Bukti Transfer/Pembayaran</label>
-                                    <input type="file" name="payment_proof" accept="image/*" required
-                                        class="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm file:mr-3 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-teal-50 file:text-teal-700">
-                                </div>
-                                <button type="submit" class="px-4 py-2.5 bg-teal-600 text-white rounded-lg text-sm font-bold hover:bg-teal-700 transition">
-                                    Kirim
-                                </button>
-                            </form>
-                        </div>
                     </div>
                 @endif
 
@@ -56,7 +81,7 @@
                     <div class="pt-3 border-t border-slate-50">
                         <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
                             <p class="text-xs text-blue-700 font-semibold">
-                                ⏳ Bukti pembayaran Anda sedang ditinjau oleh Admin. Mohon tunggu verifikasi.
+                                ⏳ Bukti pembayaran manual Anda sedang ditinjau oleh Admin.
                             </p>
                         </div>
                     </div>
@@ -84,4 +109,8 @@
 
     <div class="mt-4">{{ $fines->links() }}</div>
 </div>
+
+@push('scripts')
+    <script src="{{ config('midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}" data-client-key="{{ config('midtrans.client_key') }}"></script>
+@endpush
 @endsection

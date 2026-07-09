@@ -19,6 +19,9 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+// ─── Webhooks ──────────────────────────────────────────────
+Route::post('/webhooks/midtrans', [\App\Http\Controllers\MidtransWebhookController::class, 'handle'])->name('midtrans.webhook');
+
 // ─── Logout ──────────────────────────────────────────────
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
@@ -38,7 +41,7 @@ Route::middleware(['auth', 'student'])->group(function () {
 
     // Fines
     Route::get('/fines', [StudentLoanController::class, 'fines'])->name('student.fines');
-    Route::post('/fines/{fine}/pay', [StudentLoanController::class, 'uploadPaymentProof'])->name('student.fines.pay');
+    Route::post('/fines/{fine}/snap-token', [StudentLoanController::class, 'getSnapToken'])->name('student.fines.snap-token');
 
     // Notifications
     Route::get('/notifications', [StudentLoanController::class, 'notifications'])->name('student.notifications');

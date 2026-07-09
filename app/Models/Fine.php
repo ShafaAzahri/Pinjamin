@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Fine extends Model
 {
-    protected $fillable = ['loan_id', 'amount', 'type', 'status', 'payment_proof_photo', 'verified_by', 'verified_at'];
+    protected $fillable = ['loan_id', 'amount', 'type', 'status', 'payment_proof_photo', 'verified_by', 'verified_at', 'snap_token'];
 
     public function loan()
     {
