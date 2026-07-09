@@ -32,7 +32,7 @@
                             <div class="flex-1">
                                 <h3 class="font-bold text-red-800 text-lg">Peringatan: Denda Berjalan (L{{ str_pad($rLoan->id, 3, '0', STR_PAD_LEFT) }})</h3>
                                 <p class="text-red-700 text-sm mt-1 leading-relaxed">
-                                    Anda memiliki peminjaman yang terlambat dikembalikan. Estimasi denda saat ini adalah <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
+                                    Anda telah terlambat mengembalikan barang selama <strong>{{ $overdueHours }} jam</strong>. Estimasi denda saat ini adalah <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
                                 </p>
                                 <p class="text-red-600 text-xs mt-2 italic font-semibold">
                                     *Harap SEGERA mengembalikan barang ke Laboratorium agar denda berhenti, lalu bayar tagihan resmi Anda melalui aplikasi.

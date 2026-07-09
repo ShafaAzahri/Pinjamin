@@ -65,7 +65,7 @@
                         <h3 class="font-bold text-red-800 text-lg">Peringatan: Denda Berjalan</h3>
                         <p class="text-red-700 text-sm mt-1 leading-relaxed">
                             Peminjaman Anda telah melewati batas waktu pengembalian pada <strong>{{ $deadline->format('d M Y H:i') }} WIB</strong>. 
-                            Estimasi denda keterlambatan saat ini adalah <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
+                            Anda telah terlambat selama <strong>{{ $overdueHours }} jam</strong>, dengan estimasi denda saat ini sebesar <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
                         </p>
                         <p class="text-red-600 text-xs mt-2 italic font-semibold">
                             *Harap SEGERA mengembalikan barang ke Laboratorium agar denda tidak terus bertambah, lalu bayar tagihan resmi Anda melalui aplikasi.
