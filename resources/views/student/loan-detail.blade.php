@@ -45,6 +45,37 @@
         </div>
     </div>
 
+    <!-- Estimasi Denda Berjalan -->
+    @if($loan->status === 'terlambat' && $loan->approved_at)
+        @php
+            $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
+            $deadline = \Carbon\Carbon::parse($loan->approved_at)->addHours($loan->loan_duration_hours);
+            $overdueHours = max(0, (int) ceil(now()->diffInMinutes($deadline) / 60));
+            $estimatedFine = $overdueHours * $finePerHour;
+        @endphp
+        @if($estimatedFine > 0)
+            <div class="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-start gap-4">
+                    <div class="p-3 bg-red-100 rounded-full text-red-600 shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-red-800 text-lg">Peringatan: Denda Berjalan</h3>
+                        <p class="text-red-700 text-sm mt-1 leading-relaxed">
+                            Peminjaman Anda telah melewati batas waktu pengembalian pada <strong>{{ $deadline->format('d M Y H:i') }} WIB</strong>. 
+                            Estimasi denda keterlambatan saat ini adalah <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
+                        </p>
+                        <p class="text-red-600 text-xs mt-2 italic">
+                            *Denda bersifat sementara/berjalan dan akan terus bertambah. Tagihan resmi baru bisa dibayar setelah Anda mengembalikan barang.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endif
+
     <!-- Items -->
     <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div class="p-6 border-b border-slate-50">
