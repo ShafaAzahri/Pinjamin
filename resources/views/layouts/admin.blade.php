@@ -11,7 +11,7 @@
 <body class="h-full flex font-sans antialiased bg-slate-50">
     
     <!-- Sidebar -->
-    <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 shadow-xl shadow-slate-900/10">
+    <aside class="w-64 min-w-[16rem] bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 shadow-xl shadow-slate-900/10">
         <div>
             <!-- Brand -->
             <div class="h-16 flex items-center px-6 border-b border-slate-800">
@@ -92,7 +92,7 @@
     </aside>
 
     <!-- Main Content Panel -->
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 min-w-0 flex flex-col overflow-hidden">
         
         <!-- Header -->
         <header class="h-16 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 flex items-center justify-between shrink-0">

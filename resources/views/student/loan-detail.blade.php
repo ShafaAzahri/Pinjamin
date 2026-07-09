@@ -5,7 +5,12 @@
 @section('content')
 <div class="max-w-3xl mx-auto space-y-6">
     <div>
-        <a href="{{ route('student.loans') }}" class="text-sm text-slate-500 hover:text-teal-600 font-semibold transition">← Kembali</a>
+        <a href="{{ route('student.loans') }}" class="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-slate-200 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-50 hover:text-teal-600 transition shadow-sm mb-2">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"></path>
+            </svg>
+            Kembali
+        </a>
         <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight mt-2">
             Peminjaman L{{ str_pad($loan->id, 3, '0', STR_PAD_LEFT) }}
         </h2>
