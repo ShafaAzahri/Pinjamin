@@ -152,6 +152,7 @@
         </div>
     </footer>
 
+    <x-page-loader />
     @stack('scripts')
 </body>
 </html>

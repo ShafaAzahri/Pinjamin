@@ -142,5 +142,7 @@
         </main>
     </div>
 
+    <x-page-loader />
+    @stack('scripts')
 </body>
 </html>

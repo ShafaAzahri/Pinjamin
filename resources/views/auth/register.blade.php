@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pendaftaran Mahasiswa - Pinjamin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="min-h-full flex items-center justify-center font-sans antialiased py-12">
     <div class="w-full max-w-lg p-6">
@@ -111,5 +112,6 @@
             <a href="/login" class="font-bold text-teal-700 hover:underline">Masuk disini</a>
         </p>
     </div>
+    <x-page-loader />
 </body>
 </html>

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Pinjamin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="h-full flex items-center justify-center font-sans antialiased">
     <div class="w-full max-w-md p-6">
@@ -75,5 +76,6 @@
             <a href="/register" class="font-bold text-teal-700 hover:underline">Daftar sekarang</a>
         </p>
     </div>
+    <x-page-loader />
 </body>
 </html>
