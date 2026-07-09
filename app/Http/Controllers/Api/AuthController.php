@@ -28,10 +28,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Email atau password yang Anda masukkan salah.'], 401);
         }
 
-        if ($user->status === 'menunggu_verifikasi') {
-            return response()->json(['message' => 'Akun Anda sedang menunggu verifikasi KTM oleh Admin.'], 403);
-        }
-
         if ($user->status === 'ditangguhkan') {
             return response()->json(['message' => 'Akun Anda ditangguhkan karena pelanggaran peraturan lab.'], 403);
         }
@@ -68,10 +64,13 @@ class AuthController extends Controller
             'password'  => 'required|string|min:8|confirmed',
             'nim'       => 'required|string|max:50|unique:users',
             'prodi'     => 'required|string|max:100',
-            'ktm_photo' => 'required|image|max:2048',
+            'ktm_photo' => 'nullable|image|max:2048',
         ]);
 
-        $path = $request->file('ktm_photo')->store('ktm', 'public');
+        $path = null;
+        if ($request->hasFile('ktm_photo')) {
+            $path = $request->file('ktm_photo')->store('ktm', 'public');
+        }
 
         $user = User::create([
             'name'      => $request->name,
@@ -114,13 +113,70 @@ class AuthController extends Controller
     {
         $user = $request->user();
         return response()->json([
-            'id'     => $user->id,
-            'name'   => $user->name,
-            'email'  => $user->email,
-            'nim'    => $user->nim,
-            'prodi'  => $user->prodi,
-            'role'   => $user->role,
-            'status' => $user->status,
+            'id'            => $user->id,
+            'name'          => $user->name,
+            'email'         => $user->email,
+            'phone'         => $user->phone,
+            'nim'           => $user->nim,
+            'prodi'         => $user->prodi,
+            'role'          => $user->role,
+            'status'        => $user->status,
+            'profile_photo' => $user->profile_photo ? asset('storage/' . $user->profile_photo) : null,
+            'ktm_photo'     => $user->ktm_photo ? asset('storage/' . $user->ktm_photo) : null,
+        ]);
+    }
+
+    /**
+     * PUT /api/auth/profile
+     */
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user->status === 'aktif' && $user->ktm_photo && $request->hasFile('ktm_photo')) {
+            return response()->json(['message' => 'KTM Anda sudah disetujui dan tidak dapat diubah lagi.'], 422);
+        }
+
+        $request->validate([
+            'name'          => 'required|string|max:255',
+            'email'         => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'phone'         => 'nullable|string|max:20',
+            'password'      => 'nullable|string|min:8|confirmed',
+            'profile_photo' => 'nullable|image|max:2048',
+            'ktm_photo'     => 'nullable|image|max:2048',
+        ]);
+
+        $data = [
+            'name'  => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+        ];
+
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('profile_photo')) {
+            $path = $request->file('profile_photo')->store('profiles', 'public');
+            $data['profile_photo'] = $path;
+        }
+
+        if ($request->hasFile('ktm_photo')) {
+            $path = $request->file('ktm_photo')->store('ktm', 'public');
+            $data['ktm_photo'] = $path;
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'Profil berhasil diperbarui.',
+            'user'    => [
+                'id'            => $user->id,
+                'name'          => $user->name,
+                'email'         => $user->email,
+                'phone'         => $user->phone,
+                'profile_photo' => $user->profile_photo ? asset('storage/' . $user->profile_photo) : null,
+            ],
         ]);
     }
 }

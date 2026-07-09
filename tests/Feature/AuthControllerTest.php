@@ -42,7 +42,7 @@ class AuthControllerTest extends TestCase
         Storage::disk('public')->assertExists($user->ktm_photo);
     }
 
-    public function test_login_blocks_unverified_ktm_students()
+    public function test_login_allows_unverified_ktm_students()
     {
         $user = User::create([
             'name' => 'Unverified Student',
@@ -57,8 +57,9 @@ class AuthControllerTest extends TestCase
             'password' => 'password',
         ]);
 
-        $response->assertSessionHasErrors('email');
-        $this->assertFalse(auth()->check());
+        $response->assertRedirect('/catalog');
+        $this->assertTrue(auth()->check());
+        $this->assertEquals('menunggu_verifikasi', auth()->user()->status);
     }
 
     public function test_login_allows_active_users_and_redirects_appropriately()
@@ -98,5 +99,38 @@ class AuthControllerTest extends TestCase
         $response->assertRedirect('/admin/dashboard');
         $this->assertTrue(auth()->check());
         $this->assertEquals('admin', auth()->user()->role);
+    }
+
+    public function test_user_can_update_profile()
+    {
+        Storage::fake('public');
+        $user = User::create([
+            'name' => 'Old Name',
+            'email' => 'old@student.polines.ac.id',
+            'password' => bcrypt('password123'),
+            'role' => 'user',
+            'status' => 'aktif',
+        ]);
+
+        $profilePhoto = UploadedFile::fake()->create('profile.jpg', 100, 'image/jpeg');
+
+        $response = $this->actingAs($user)->post('/profile', [
+            'name' => 'New Name',
+            'email' => 'new@student.polines.ac.id',
+            'phone' => '08123456789',
+            'password' => 'newpassword123',
+            'password_confirmation' => 'newpassword123',
+            'profile_photo' => $profilePhoto,
+        ]);
+
+        $response->assertRedirect();
+        
+        $user->refresh();
+        $this->assertEquals('New Name', $user->name);
+        $this->assertEquals('new@student.polines.ac.id', $user->email);
+        $this->assertEquals('08123456789', $user->phone);
+        $this->assertTrue(\Illuminate\Support\Facades\Hash::check('newpassword123', $user->password));
+        $this->assertNotNull($user->profile_photo);
+        Storage::disk('public')->assertExists($user->profile_photo);
     }
 }

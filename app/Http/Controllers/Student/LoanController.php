@@ -2,22 +2,21 @@
 
 namespace App\Http\Controllers\Student;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\WebApiController;
 use App\Models\Loan;
-use App\Models\LoanItem;
 use App\Models\Fine;
-use App\Models\Notification;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class LoanController extends Controller
+class LoanController extends WebApiController
 {
-    /**
-     * Display student's loan history.
-     */
     public function index()
     {
-        $loans = Loan::where('user_id', Auth::id())
+        // Panggil REST API internal
+        $response = $this->callApi('GET', '/api/loans');
+
+        // Untuk kompatibilitas pagination di Blade view, kita fetch dari DB berdasarkan ID hasil API
+        $loansData = $response['data'] ?? [];
+        $loans = Loan::whereIn('id', collect($loansData)->pluck('id'))
             ->with(['loanItems.unit.item', 'fines'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
@@ -25,131 +24,102 @@ class LoanController extends Controller
         return view('student.loans', compact('loans'));
     }
 
-    /**
-     * Show loan detail.
-     */
     public function show(Loan $loan)
     {
-        // Security: only allow viewing own loans
-        if ($loan->user_id !== Auth::id()) {
-            abort(403, 'Akses ditolak.');
+        // Panggil REST API internal
+        $response = $this->callApi('GET', "/api/loans/{$loan->id}");
+
+        if (isset($response['message'])) {
+            abort(403, $response['message']);
         }
 
         $loan->load(['loanItems.unit.item', 'fines']);
         return view('student.loan-detail', compact('loan'));
     }
 
-    /**
-     * Submit return request with photo proof for each item.
-     */
     public function submitReturn(Request $request, Loan $loan)
     {
-        if ($loan->user_id !== Auth::id()) {
-            abort(403, 'Akses ditolak.');
+        $data = [];
+        if ($request->has('return_photos')) {
+            $data['return_photos'] = $request->file('return_photos');
         }
 
-        if (!in_array($loan->status, ['aktif', 'terlambat'])) {
-            return back()->with('error', 'Peminjaman ini tidak dapat dikembalikan.');
+        // Panggil REST API internal
+        $response = $this->callApi('POST', "/api/loans/{$loan->id}/return", $data);
+
+        if (isset($response['message']) && str_contains($response['message'], 'berhasil')) {
+            return back()->with('success', $response['message']);
         }
 
-        $request->validate([
-            'return_photos'   => 'required|array',
-            'return_photos.*' => 'required|file|max:2048',
-        ], [
-            'return_photos.required'   => 'Foto bukti pengembalian wajib diunggah.',
-            'return_photos.*.required' => 'Foto bukti untuk setiap item wajib diunggah.',
-        ]);
-
-        foreach ($loan->loanItems as $loanItem) {
-            if ($request->hasFile("return_photos.{$loanItem->id}")) {
-                $path = $request->file("return_photos.{$loanItem->id}")
-                    ->store('return_proofs', 'public');
-                $loanItem->update(['return_proof_photo' => $path]);
-            }
-        }
-
-        $loan->update(['status' => 'menunggu_verifikasi_kembali']);
-
-        return back()->with('success', 'Permintaan pengembalian berhasil dikirim! Menunggu verifikasi Admin.');
+        return back()->with('error', $response['message'] ?? 'Gagal memproses pengembalian.');
     }
 
-    /**
-     * Student's notifications page.
-     */
     public function notifications()
     {
-        $notifications = Notification::where('user_id', Auth::id())
+        // Panggil REST API internal untuk fetch notifikasi
+        $response = $this->callApi('GET', '/api/notifications');
+
+        $notifications = \App\Models\Notification::where('user_id', auth()->id())
             ->orderBy('created_at', 'desc')
             ->paginate(20);
-
-        // Mark all as read
-        Notification::where('user_id', Auth::id())
-            ->where('is_read', false)
-            ->update(['is_read' => true]);
 
         return view('student.notifications', compact('notifications'));
     }
 
-    /**
-     * Student's fines page.
-     */
     public function fines()
     {
+        // Panggil REST API internal untuk fetch denda
+        $response = $this->callApi('GET', '/api/fines');
+
         $fines = Fine::whereHas('loan', function ($q) {
-            $q->where('user_id', Auth::id());
+            $q->where('user_id', auth()->id());
         })->with('loan')->orderBy('created_at', 'desc')->paginate(10);
 
         return view('student.fines', compact('fines'));
     }
 
-    /**
-     * Get Midtrans Snap Token for a fine.
-     */
     public function getSnapToken(Request $request, Fine $fine)
     {
-        // Security: verify fine belongs to this user
-        if ($fine->loan->user_id !== Auth::id()) {
-            abort(403, 'Akses ditolak.');
+        // Panggil REST API internal untuk generate snap token
+        $response = $this->callApi('POST', "/api/fines/{$fine->id}/pay");
+
+        if (!isset($response['snap_token'])) {
+            return response()->json(['error' => $response['message'] ?? 'Gagal menghubungi payment gateway.'], 500);
         }
 
-        if ($fine->status !== 'belum_dibayar') {
-            return response()->json(['error' => 'Denda ini tidak dalam status belum dibayar.'], 400);
+        return response()->json($response);
+    }
+
+    public function profile()
+    {
+        $user = auth()->user();
+        return view('student.profile', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $data = [
+            'name'                  => $request->input('name'),
+            'email'                 => $request->input('email'),
+            'phone'                 => $request->input('phone'),
+            'password'              => $request->input('password'),
+            'password_confirmation' => $request->input('password_confirmation'),
+        ];
+
+        if ($request->hasFile('profile_photo')) {
+            $data['profile_photo'] = $request->file('profile_photo');
         }
 
-        // If snap token already exists, just return it
-        if ($fine->snap_token) {
-            return response()->json(['snap_token' => $fine->snap_token]);
+        if ($request->hasFile('ktm_photo')) {
+            $data['ktm_photo'] = $request->file('ktm_photo');
         }
 
-        // Set your Merchant Server Key
-        \Midtrans\Config::$serverKey = config('midtrans.server_key');
-        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
-        \Midtrans\Config::$isProduction = config('midtrans.is_production');
-        // Set sanitization on (default)
-        \Midtrans\Config::$isSanitized = config('midtrans.is_sanitized');
-        // Set 3DS transaction for credit card to true
-        \Midtrans\Config::$is3ds = config('midtrans.is_3ds');
+        $response = $this->callApi('PUT', '/api/auth/profile', $data);
 
-        $params = array(
-            'transaction_details' => array(
-                'order_id' => 'FINE-' . $fine->id . '-' . time(),
-                'gross_amount' => $fine->amount,
-            ),
-            'customer_details' => array(
-                'first_name' => Auth::user()->name,
-                'email' => Auth::user()->email,
-            ),
-        );
-
-        try {
-            $snapToken = \Midtrans\Snap::getSnapToken($params);
-            
-            // Save snap token to fine
-            $fine->update(['snap_token' => $snapToken]);
-
-            return response()->json(['snap_token' => $snapToken]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 500);
+        if (isset($response['message']) && str_contains($response['message'], 'berhasil')) {
+            return back()->with('success', 'Profil Anda berhasil diperbarui!');
         }
+
+        return back()->with('error', $response['message'] ?? 'Gagal memperbarui profil.');
     }
 }

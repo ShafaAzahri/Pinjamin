@@ -67,9 +67,23 @@
                 </p>
             </div>
 
-            <button type="submit" class="w-full py-3 bg-teal-600 text-white rounded-xl font-bold text-sm hover:bg-teal-700 shadow-md shadow-teal-600/20 transition">
-                Ajukan Peminjaman
-            </button>
+            @if(!auth()->user()->ktm_photo)
+                <div class="p-4 bg-amber-50 rounded-xl border border-amber-100 text-center">
+                    <p class="text-sm text-amber-800 font-bold">
+                        Anda harus mengunggah foto KTM di halaman <a href="{{ route('student.profile') }}" class="underline font-extrabold hover:text-amber-900">Profil Saya</a> terlebih dahulu sebelum mengajukan peminjaman.
+                    </p>
+                </div>
+            @elseif(auth()->user()->status !== 'aktif')
+                <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 text-center">
+                    <p class="text-sm text-blue-800 font-bold">
+                        Akun Anda sedang menunggu verifikasi KTM oleh Admin. Harap tunggu hingga akun Anda aktif.
+                    </p>
+                </div>
+            @else
+                <button type="submit" class="w-full py-3 bg-teal-600 text-white rounded-xl font-bold text-sm hover:bg-teal-700 shadow-md shadow-teal-600/20 transition">
+                    Ajukan Peminjaman
+                </button>
+            @endif
         </form>
     @else
         <div class="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">

@@ -18,11 +18,16 @@ use App\Http\Controllers\Api\AdminController;
 |--------------------------------------------------------------------------
 */
 
+use App\Http\Controllers\Api\PaymentController;
+
 // ─── Public: Auth ────────────────────────────────────────────────────────
 Route::prefix('auth')->group(function () {
     Route::post('/login',    [AuthController::class, 'login']);
     Route::post('/register', [AuthController::class, 'register']);
 });
+
+// ─── Webhooks ────────────────────────────────────────────────────────────
+Route::post('/webhooks/payment', [PaymentController::class, 'webhook']);
 
 // ─── Protected Routes ────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
@@ -30,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Auth
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::get('/auth/me',      [AuthController::class, 'me']);
+    Route::put('/auth/profile', [AuthController::class, 'updateProfile']);
 
     // ─── Student Routes ───────────────────────────────────────────────
     Route::middleware('student')->group(function () {
@@ -45,7 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
         // Fines
         Route::get('/fines',                         [StudentController::class, 'fines']);
-        Route::post('/fines/{fine}/snap-token',      [StudentController::class, 'getSnapToken']);
+        Route::post('/fines/{fine}/pay',      [PaymentController::class, 'pay']);
 
         // Notifications
         Route::get('/notifications',                 [StudentController::class, 'notifications']);

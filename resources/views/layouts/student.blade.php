@@ -79,6 +79,9 @@
                                 <p class="text-sm font-bold text-slate-800">{{ Auth::user()->name }}</p>
                                 <p class="text-xs text-slate-400">{{ Auth::user()->nim }}</p>
                             </div>
+                            <a href="{{ route('student.profile') }}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 font-semibold transition">
+                                Profil Saya
+                            </a>
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 font-semibold transition">

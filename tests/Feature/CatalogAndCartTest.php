@@ -35,6 +35,7 @@ class CatalogAndCartTest extends TestCase
             'status' => 'aktif',
             'nim' => '3.32.22.0.12',
             'prodi' => 'Teknik Elektro',
+            'ktm_photo' => 'ktm/test.jpg',
         ]);
 
         $this->category = Category::create([
@@ -115,5 +116,55 @@ class CatalogAndCartTest extends TestCase
             'loan_duration_hours' => 6,
         ]);
         $this->assertNull(session('cart'));
+    }
+
+    public function test_student_without_ktm_cannot_checkout()
+    {
+        $studentWithoutKtm = User::create([
+            'name' => 'No KTM Student',
+            'email' => 'noktm@student.polines.ac.id',
+            'password' => bcrypt('password'),
+            'role' => 'user',
+            'status' => 'aktif',
+            'nim' => '3.32.22.0.99',
+            'prodi' => 'Teknik Elektro',
+            'ktm_photo' => null,
+        ]);
+
+        $this->actingAs($studentWithoutKtm)->post('/catalog/add-to-cart', ['item_unit_id' => $this->unit1->id]);
+
+        $response = $this->actingAs($studentWithoutKtm)->post('/cart/checkout', [
+            'loan_duration_hours' => 6,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('loans', [
+            'user_id' => $studentWithoutKtm->id,
+        ]);
+    }
+
+    public function test_student_unverified_cannot_checkout()
+    {
+        $unverifiedStudent = User::create([
+            'name' => 'Unverified Student',
+            'email' => 'unverified@student.polines.ac.id',
+            'password' => bcrypt('password'),
+            'role' => 'user',
+            'status' => 'menunggu_verifikasi',
+            'nim' => '3.32.22.0.98',
+            'prodi' => 'Teknik Elektro',
+            'ktm_photo' => 'ktm/test.jpg',
+        ]);
+
+        $this->actingAs($unverifiedStudent)->post('/catalog/add-to-cart', ['item_unit_id' => $this->unit1->id]);
+
+        $response = $this->actingAs($unverifiedStudent)->post('/cart/checkout', [
+            'loan_duration_hours' => 6,
+        ]);
+
+        $response->assertRedirect();
+        $this->assertDatabaseMissing('loans', [
+            'user_id' => $unverifiedStudent->id,
+        ]);
     }
 }

@@ -45,6 +45,10 @@ Route::middleware(['auth', 'student'])->group(function () {
 
     // Notifications
     Route::get('/notifications', [StudentLoanController::class, 'notifications'])->name('student.notifications');
+
+    // Profile
+    Route::get('/profile', [StudentLoanController::class, 'profile'])->name('student.profile');
+    Route::post('/profile', [StudentLoanController::class, 'updateProfile'])->name('student.profile.update');
 });
 
 // ─── Admin Routes ────────────────────────────────────────

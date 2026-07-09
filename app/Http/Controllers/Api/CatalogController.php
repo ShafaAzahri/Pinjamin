@@ -83,6 +83,15 @@ class CatalogController extends Controller
             'loan_duration_hours'=> 'required|integer|min:1',
         ]);
 
+        $user = Auth::user();
+        if (!$user->ktm_photo) {
+            return response()->json(['message' => 'Anda harus mengunggah foto KTM terlebih dahulu sebelum melakukan peminjaman.'], 422);
+        }
+
+        if ($user->status !== 'aktif') {
+            return response()->json(['message' => 'Akun Anda belum aktif/menunggu verifikasi KTM oleh Admin.'], 422);
+        }
+
         $maxItems    = (int) (Setting::where('key', 'max_items_borrowed')->first()?->value ?? 3);
         $maxDuration = (int) (Setting::where('key', 'max_loan_duration')->first()?->value ?? 8);
 

@@ -8,6 +8,11 @@ class Loan extends Model
 {
     protected $fillable = ['user_id', 'status', 'loan_duration_hours', 'approved_by', 'approved_at', 'returned_at'];
 
+    protected $casts = [
+        'approved_at' => 'datetime',
+        'returned_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
