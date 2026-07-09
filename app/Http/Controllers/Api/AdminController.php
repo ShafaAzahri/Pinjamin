@@ -122,12 +122,26 @@ class AdminController extends Controller
         $loan->update([
             'status'      => 'aktif',
             'approved_at' => now(),
+            'approved_by' => Auth::id(),
         ]);
 
         $loan->user->notifications()->create([
             'title'   => 'Peminjaman Disetujui',
             'message' => 'Peminjaman Anda telah disetujui. Silakan ambil barang di Lab.',
         ]);
+
+        $user = $loan->user;
+        if ($user && $user->phone) {
+            $itemNames = $loan->loanItems->map(function ($li) {
+                return ($li->unit->item->name ?? 'Barang') . ' (' . ($li->unit->serial_number ?? '-') . ')';
+            })->implode(', ');
+
+            $message = "Halo *{$user->name}*,\n\nPeminjaman alat Anda dengan ID *L" . str_pad($loan->id, 3, '0', STR_PAD_LEFT) . "* telah *DISETUJUI* oleh Admin.\n\n" .
+                       "Barang: {$itemNames}\n\n" .
+                       "Silakan segera mengambil barang Anda di Laboratorium.\n\nTerima kasih.";
+
+            \App\Services\WhatsAppService::send($user->phone, $message);
+        }
 
         foreach ($loan->loanItems as $li) {
             $li->unit->update(['status' => 'dipinjam']);
@@ -152,6 +166,15 @@ class AdminController extends Controller
             'message' => $request->input('reason', 'Permintaan peminjaman Anda ditolak oleh Admin.'),
         ]);
 
+        $user = $loan->user;
+        if ($user && $user->phone) {
+            $reason = $request->input('reason', 'Permintaan peminjaman Anda ditolak oleh Admin.');
+            $message = "Halo *{$user->name}*,\n\nPeminjaman alat Anda dengan ID *L" . str_pad($loan->id, 3, '0', STR_PAD_LEFT) . "* telah *DITOLAK* oleh Admin.\n\n" .
+                       "Alasan: {$reason}\n\nTerima kasih.";
+
+            \App\Services\WhatsAppService::send($user->phone, $message);
+        }
+
         return response()->json(['message' => 'Peminjaman berhasil ditolak.']);
     }
 
@@ -166,19 +189,64 @@ class AdminController extends Controller
 
         $request->validate([
             'action' => 'required|in:approve,reject',
+            'unit_conditions'   => 'nullable|array',
+            'unit_conditions.*' => 'required|in:baik,rusak',
         ]);
 
         if ($request->action === 'approve') {
-            $loan->update(['status' => 'selesai']);
+            \Illuminate\Support\Facades\DB::transaction(function () use ($request, $loan) {
+                $totalFine = 0;
+                $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
+                $maxDuration = (int) (\App\Models\Setting::where('key', 'max_loan_duration')->first()?->value ?? 8);
 
-            foreach ($loan->loanItems as $li) {
-                $li->unit->update(['status' => 'tersedia']);
-            }
+                $approvedAt = \Carbon\Carbon::parse($loan->approved_at);
+                $returnedAt = now();
+                $deadline = $approvedAt->copy()->addHours($maxDuration);
 
-            $loan->user->notifications()->create([
-                'title'   => 'Pengembalian Dikonfirmasi',
-                'message' => 'Pengembalian barang Anda telah berhasil dikonfirmasi oleh Admin.',
-            ]);
+                if ($returnedAt->greaterThan($deadline)) {
+                    $overdueHours = (int) ceil(abs($returnedAt->diffInMinutes($deadline)) / 60);
+                    $totalFine += $overdueHours * $finePerHour;
+                }
+
+                $unitConditions = $request->input('unit_conditions', []);
+                foreach ($loan->loanItems as $loanItem) {
+                    $newCondition = $unitConditions[$loanItem->id] ?? 'baik';
+                    $loanItem->update(['return_condition' => $newCondition]);
+
+                    $loanItem->unit->update([
+                        'status'    => $newCondition === 'rusak' ? 'maintenance' : 'tersedia',
+                        'condition' => $newCondition,
+                    ]);
+
+                    if ($newCondition === 'rusak') {
+                        \App\Models\Fine::create([
+                            'loan_id' => $loan->id,
+                            'amount'  => 50000,
+                            'type'    => 'kerusakan_barang',
+                            'status'  => 'belum_dibayar',
+                        ]);
+                    }
+                }
+
+                if ($totalFine > 0) {
+                    \App\Models\Fine::create([
+                        'loan_id' => $loan->id,
+                        'amount'  => $totalFine,
+                        'type'    => 'keterlambatan',
+                        'status'  => 'belum_dibayar',
+                    ]);
+                }
+
+                $loan->update([
+                    'status'      => 'selesai',
+                    'returned_at' => $returnedAt,
+                ]);
+
+                $loan->user->notifications()->create([
+                    'title'   => 'Pengembalian Dikonfirmasi',
+                    'message' => 'Pengembalian barang Anda telah berhasil dikonfirmasi oleh Admin.',
+                ]);
+            });
         } else {
             $loan->update(['status' => 'aktif']);
             $loan->user->notifications()->create([
