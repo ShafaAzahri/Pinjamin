@@ -67,8 +67,8 @@
                             Peminjaman Anda telah melewati batas waktu pengembalian pada <strong>{{ $deadline->format('d M Y H:i') }} WIB</strong>. 
                             Estimasi denda keterlambatan saat ini adalah <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
                         </p>
-                        <p class="text-red-600 text-xs mt-2 italic">
-                            *Denda bersifat sementara/berjalan dan akan terus bertambah. Tagihan resmi baru bisa dibayar setelah Anda mengembalikan barang.
+                        <p class="text-red-600 text-xs mt-2 italic font-semibold">
+                            *Harap SEGERA mengembalikan barang ke Laboratorium agar denda tidak terus bertambah, lalu bayar tagihan resmi Anda melalui aplikasi.
                         </p>
                     </div>
                 </div>
