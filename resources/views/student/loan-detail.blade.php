@@ -50,7 +50,7 @@
         @php
             $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
             $deadline = \Carbon\Carbon::parse($loan->approved_at)->addHours($loan->loan_duration_hours);
-            $overdueHours = max(0, (int) ceil(now()->diffInMinutes($deadline) / 60));
+            $overdueHours = max(0, (int) ceil(abs(now()->diffInMinutes($deadline)) / 60));
             $estimatedFine = $overdueHours * $finePerHour;
         @endphp
         @if($estimatedFine > 0)

@@ -18,7 +18,7 @@
             @foreach($runningFines as $rLoan)
                 @php
                     $deadline = \Carbon\Carbon::parse($rLoan->approved_at)->addHours($rLoan->loan_duration_hours);
-                    $overdueHours = max(0, (int) ceil(now()->diffInMinutes($deadline) / 60));
+                    $overdueHours = max(0, (int) ceil(abs(now()->diffInMinutes($deadline)) / 60));
                     $estimatedFine = $overdueHours * $finePerHour;
                 @endphp
                 @if($estimatedFine > 0)
