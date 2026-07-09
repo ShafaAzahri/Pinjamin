@@ -19,6 +19,12 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        \Illuminate\Auth\Middleware\RedirectIfAuthenticated::redirectUsing(function ($request) {
+            $user = $request->user();
+            if ($user) {
+                return $user->role === 'admin' ? '/admin/dashboard' : '/catalog';
+            }
+            return '/';
+        });
     }
 }
