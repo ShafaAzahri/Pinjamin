@@ -75,7 +75,12 @@ class LoanController extends WebApiController
             $q->where('user_id', auth()->id());
         })->with('loan')->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('student.fines', compact('fines'));
+        $runningFines = \App\Models\Loan::where('user_id', auth()->id())
+            ->where('status', 'terlambat')
+            ->whereNotNull('approved_at')
+            ->get();
+
+        return view('student.fines', compact('fines', 'runningFines'));
     }
 
     public function getSnapToken(Request $request, Fine $fine)
