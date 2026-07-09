@@ -2,13 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
-class AuthController extends Controller
+class AuthController extends WebApiController
 {
     public function showLogin()
     {
@@ -20,28 +17,17 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
+        $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
-            $user = Auth::user();
+        $response = $this->callApi('POST', '/api/auth/login', $request->all());
 
-            if ($user->status === 'menunggu_verifikasi') {
-                Auth::logout();
-                throw ValidationException::withMessages([
-                    'email' => 'Akun Anda sedang menunggu verifikasi KTM oleh Admin. Silakan periksa berkala.',
-                ]);
-            }
-
-            if ($user->status === 'ditangguhkan') {
-                Auth::logout();
-                throw ValidationException::withMessages([
-                    'email' => 'Akun Anda ditangguhkan karena pelanggaran peraturan lab.',
-                ]);
-            }
-
+        if (isset($response['token'])) {
+            // Login sukses di API, mari kita buat session login di web
+            $user = \App\Models\User::where('email', $request->email)->first();
+            Auth::login($user, $request->boolean('remember'));
             $request->session()->regenerate();
 
             return $user->role === 'admin' 
@@ -49,8 +35,8 @@ class AuthController extends Controller
                 : redirect()->intended('/catalog');
         }
 
-        throw ValidationException::withMessages([
-            'email' => 'Email atau password yang Anda masukkan salah.',
+        return back()->withErrors([
+            'email' => $response['message'] ?? 'Email atau password salah.',
         ]);
     }
 
@@ -64,46 +50,27 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'nim' => 'required|string|max:50|unique:users',
-            'prodi' => 'required|string|max:100',
-            'ktm_photo' => 'required|image|max:2048', // Max 2MB
-        ], [
-            'name.required' => 'Nama wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.unique' => 'Email ini sudah terdaftar.',
-            'password.required' => 'Password wajib diisi.',
-            'password.min' => 'Password minimal terdiri dari 8 karakter.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'nim.required' => 'NIM wajib diisi.',
-            'nim.unique' => 'NIM ini sudah terdaftar.',
-            'prodi.required' => 'Program studi wajib diisi.',
-            'ktm_photo.required' => 'Foto KTM wajib diunggah.',
-            'ktm_photo.image' => 'Berkas KTM harus berupa gambar.',
-        ]);
+        // Karena upload file harus diproses, kita kirim data pendaftaran ke API
+        // Catatan: request internal menangani file dengan baik jika dikirim dalam array request.
+        $data = $request->all();
+        if ($request->hasFile('ktm_photo')) {
+            $data['ktm_photo'] = $request->file('ktm_photo');
+        }
 
-        $path = $request->file('ktm_photo')->store('ktm', 'public');
+        $response = $this->callApi('POST', '/api/auth/register', $data);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => 'user',
-            'nim' => $request->nim,
-            'prodi' => $request->prodi,
-            'ktm_photo' => $path,
-            'status' => 'menunggu_verifikasi',
-        ]);
+        if (isset($response['user'])) {
+            return redirect('/login')->with('success', $response['message']);
+        }
 
-        return redirect('/login')->with('success', 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi KTM oleh Admin.');
+        return back()->withErrors($response['errors'] ?? ['email' => $response['message'] ?? 'Pendaftaran gagal.'])->withInput();
     }
 
     public function logout(Request $request)
     {
-        Auth::logout();
+        if (Auth::check()) {
+            Auth::logout();
+        }
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         return redirect('/login');

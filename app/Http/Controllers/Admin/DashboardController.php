@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\WebApiController;
 use App\Models\User;
 use App\Models\Loan;
 use App\Models\Fine;
 use App\Models\ItemUnit;
-use App\Models\Notification;
 use Illuminate\Http\Request;
 
-class DashboardController extends Controller
+class DashboardController extends WebApiController
 {
     public function index()
     {
-        $totalLoansToday = Loan::whereDate('created_at', today())->count();
+        $response = $this->callApi('GET', '/api/admin/dashboard');
+        
+        $totalLoansToday = Loan::whereDate('created_at', today())->count(); // fallback log
         $itemsBorrowed = ItemUnit::where('status', 'dipinjam')->count();
-        $pendingFines = Fine::where('status', 'belum_dibayar')->sum('amount');
+        $pendingFines = $response['data']['total_unpaid_fines'] ?? 0;
         
         $pendingUsers = User::where('role', 'user')
             ->where('status', 'menunggu_verifikasi')
@@ -40,24 +41,17 @@ class DashboardController extends Controller
     public function verifyUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
-        $action = $request->input('action');
+        
+        // Panggil endpoint API Admin secara internal
+        $response = $this->callApi('POST', "/api/admin/users/{$user->id}/verify", [
+            'action' => $request->input('action')
+        ]);
 
-        if ($action === 'approve') {
-            $user->update(['status' => 'aktif']);
-
-            // Send notification
-            Notification::create([
-                'user_id' => $user->id,
-                'title' => 'Akun Anda Berhasil Diverifikasi',
-                'message' => 'Selamat! Akun Anda telah diverifikasi oleh Admin. Sekarang Anda dapat mengajukan peminjaman alat laboratorium.',
-            ]);
-
-            return redirect('/admin/dashboard')->with('success', "Akun mahasiswa {$user->name} berhasil diverifikasi!");
-        } elseif ($action === 'reject') {
-            $user->delete();
+        if ($request->input('action') === 'reject') {
+            $user->delete(); // maintain original delete-on-reject behavior
             return redirect('/admin/dashboard')->with('success', "Pendaftaran mahasiswa {$user->name} ditolak dan akun dihapus.");
         }
 
-        return redirect('/admin/dashboard');
+        return redirect('/admin/dashboard')->with('success', $response['message'] ?? 'Status berhasil diubah.');
     }
 }
