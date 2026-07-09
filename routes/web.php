@@ -23,7 +23,6 @@ Route::middleware(['auth', 'student'])->group(function () {
 });
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return 'Admin Dashboard';
-    })->name('admin.dashboard');
+    Route::get('/admin/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::post('/admin/users/{id}/verify', [App\Http\Controllers\Admin\DashboardController::class, 'verifyUser'])->name('admin.users.verify');
 });
