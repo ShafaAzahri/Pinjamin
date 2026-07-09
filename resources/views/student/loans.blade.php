@@ -15,7 +15,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <h3 class="font-bold text-slate-800">Peminjaman L{{ str_pad($loan->id, 3, '0', STR_PAD_LEFT) }}</h3>
-                        <p class="text-xs text-slate-400">{{ $loan->created_at->format('d M Y H:i') }} · {{ $loan->loan_duration_hours }} jam</p>
+                        <p class="text-xs text-slate-400">{{ $loan->created_at->format('d M Y H:i') }} · {{ $loan->loan_duration }} {{ $loan->loan_duration_type === 'days' ? 'hari' : 'jam' }}</p>
                     </div>
                     @php
                         $statusMap = [

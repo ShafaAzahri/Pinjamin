@@ -80,7 +80,8 @@ class CatalogController extends Controller
         $request->validate([
             'item_unit_ids'      => 'required|array|min:1',
             'item_unit_ids.*'    => 'required|exists:item_units,id',
-            'loan_duration_hours'=> 'required|integer|min:1',
+            'loan_duration'      => 'required|integer|min:1',
+            'loan_duration_type' => 'required|in:hours,days',
         ]);
 
         $user = Auth::user();
@@ -99,8 +100,11 @@ class CatalogController extends Controller
             return response()->json(['message' => "Maksimal {$maxItems} barang dapat dipinjam sekaligus."], 422);
         }
 
-        if ($request->loan_duration_hours > $maxDuration) {
-            return response()->json(['message' => "Durasi peminjaman maksimal {$maxDuration} jam."], 422);
+        // Convert requested duration to hours for max check
+        $requestedHours = $request->loan_duration_type === 'days' ? $request->loan_duration * 24 : $request->loan_duration;
+
+        if ($requestedHours > $maxDuration) {
+            return response()->json(['message' => "Total durasi peminjaman maksimal {$maxDuration} jam."], 422);
         }
 
         // Check for active loans
@@ -124,7 +128,8 @@ class CatalogController extends Controller
             $loan = Loan::create([
                 'user_id'             => Auth::id(),
                 'status'              => 'menunggu_persetujuan',
-                'loan_duration_hours' => $request->loan_duration_hours,
+                'loan_duration'       => $request->loan_duration,
+                'loan_duration_type'  => $request->loan_duration_type,
             ]);
 
             foreach ($request->item_unit_ids as $unitId) {

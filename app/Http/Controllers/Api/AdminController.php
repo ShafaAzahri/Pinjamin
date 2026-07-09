@@ -196,16 +196,27 @@ class AdminController extends Controller
         if ($request->action === 'approve') {
             \Illuminate\Support\Facades\DB::transaction(function () use ($request, $loan) {
                 $totalFine = 0;
-                $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
-                $maxDuration = (int) (\App\Models\Setting::where('key', 'max_loan_duration')->first()?->value ?? 8);
+                $fineAmount = (int) (\App\Models\Setting::where('key', 'fine_amount')->first()?->value ?? 5000);
+                $fineType = \App\Models\Setting::where('key', 'fine_type')->first()?->value ?? 'per_hour';
 
                 $approvedAt = \Carbon\Carbon::parse($loan->approved_at);
                 $returnedAt = now();
-                $deadline = $approvedAt->copy()->addHours($maxDuration);
+                
+                $deadline = $approvedAt->copy();
+                if ($loan->loan_duration_type === 'days') {
+                    $deadline->addDays($loan->loan_duration);
+                } else {
+                    $deadline->addHours($loan->loan_duration);
+                }
 
                 if ($returnedAt->greaterThan($deadline)) {
-                    $overdueHours = (int) ceil(abs($returnedAt->diffInMinutes($deadline)) / 60);
-                    $totalFine += $overdueHours * $finePerHour;
+                    $overdueMinutes = abs($returnedAt->diffInMinutes($deadline));
+                    if ($fineType === 'per_day') {
+                        $overdueUnits = (int) ceil($overdueMinutes / 1440); // 1440 minutes = 1 day
+                    } else {
+                        $overdueUnits = (int) ceil($overdueMinutes / 60); // default per hour
+                    }
+                    $totalFine += $overdueUnits * $fineAmount;
                 }
 
                 $unitConditions = $request->input('unit_conditions', []);
@@ -384,12 +395,13 @@ class AdminController extends Controller
     {
         $request->validate([
             'max_loan_duration'  => 'sometimes|integer|min:1',
-            'fine_per_hour'      => 'sometimes|integer|min:0',
+            'fine_amount'        => 'sometimes|integer|min:0',
+            'fine_type'          => 'sometimes|in:per_hour,per_day',
             'max_items_borrowed' => 'sometimes|integer|min:1',
         ]);
 
-        foreach ($request->only(['max_loan_duration', 'fine_per_hour', 'max_items_borrowed']) as $key => $value) {
-            Setting::where('key', $key)->update(['value' => $value]);
+        foreach ($request->only(['max_loan_duration', 'fine_amount', 'fine_type', 'max_items_borrowed']) as $key => $value) {
+            Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
 
         return response()->json(['message' => 'Pengaturan berhasil diperbarui.']);

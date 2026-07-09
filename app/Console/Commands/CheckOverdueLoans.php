@@ -27,8 +27,12 @@ class CheckOverdueLoans extends Command
                 continue;
             }
 
-            // Batas waktu pengembalian = approved_at + loan_duration_hours
-            $deadline = \Carbon\Carbon::parse($loan->approved_at)->addHours($loan->loan_duration_hours);
+            $deadline = \Carbon\Carbon::parse($loan->approved_at);
+            if ($loan->loan_duration_type === 'days') {
+                $deadline->addDays($loan->loan_duration);
+            } else {
+                $deadline->addHours($loan->loan_duration);
+            }
 
             if ($now->greaterThan($deadline)) {
                 $loan->update(['status' => 'terlambat']);
@@ -40,13 +44,15 @@ class CheckOverdueLoans extends Command
                         return ($li->unit->item->name ?? 'Barang') . ' (' . ($li->unit->serial_number ?? '-') . ')';
                     })->implode(', ');
 
-                    $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
-                    $formattedFine = number_format($finePerHour, 0, ',', '.');
+                    $fineAmount = (int) (\App\Models\Setting::where('key', 'fine_amount')->first()?->value ?? 5000);
+                    $fineType = \App\Models\Setting::where('key', 'fine_type')->first()?->value ?? 'per_hour';
+                    $formattedFine = number_format($fineAmount, 0, ',', '.');
+                    $fineLabel = $fineType === 'per_day' ? 'hari' : 'jam';
 
                     $message = "Halo *{$user->name}*,\n\nPeminjaman alat Anda dengan ID *L" . str_pad($loan->id, 3, '0', STR_PAD_LEFT) . "* telah *MELEWATI BATAS WAKTU* pengembalian.\n\n" .
                                "Barang: {$itemNames}\n" .
                                "Batas Waktu: " . $deadline->format('d M Y H:i') . " WIB\n\n" .
-                               "Saat ini Anda dikenakan denda keterlambatan berjalan sebesar *Rp {$formattedFine}/jam*. Harap segera mengembalikan alat tersebut ke Laboratorium dan memverifikasi pengembalian di aplikasi Pinjamin.\n\nTerima kasih.";
+                               "Saat ini Anda dikenakan denda keterlambatan berjalan sebesar *Rp {$formattedFine}/{$fineLabel}*. Harap segera mengembalikan alat tersebut ke Laboratorium dan memverifikasi pengembalian di aplikasi Pinjamin.\n\nTerima kasih.";
 
                     \App\Services\WhatsAppService::send($user->phone, $message);
                 }

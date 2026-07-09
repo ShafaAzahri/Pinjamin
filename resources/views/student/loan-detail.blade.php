@@ -48,10 +48,27 @@
     <!-- Estimasi Denda Berjalan -->
     @if($loan->status === 'terlambat' && $loan->approved_at)
         @php
-            $finePerHour = (int) (\App\Models\Setting::where('key', 'fine_per_hour')->first()?->value ?? 5000);
-            $deadline = \Carbon\Carbon::parse($loan->approved_at)->addHours($loan->loan_duration_hours);
-            $overdueHours = max(0, (int) ceil(abs(now()->diffInMinutes($deadline)) / 60));
-            $estimatedFine = $overdueHours * $finePerHour;
+            $fineAmount = (int) (\App\Models\Setting::where('key', 'fine_amount')->first()?->value ?? 5000);
+            $fineType   = \App\Models\Setting::where('key', 'fine_type')->first()?->value ?? 'per_hour';
+
+            $deadline = \Carbon\Carbon::parse($loan->approved_at);
+            if ($loan->loan_duration_type === 'days') {
+                $deadline->addDays($loan->loan_duration);
+            } else {
+                $deadline->addHours($loan->loan_duration);
+            }
+
+            $overdueMinutes = abs(now()->diffInMinutes($deadline));
+            if ($fineType === 'per_day') {
+                $overdueUnits = max(0, (int) ceil($overdueMinutes / 1440));
+                $overdueLabel = $overdueUnits . ' hari';
+                $fineLabel    = '/hari';
+            } else {
+                $overdueUnits = max(0, (int) ceil($overdueMinutes / 60));
+                $overdueLabel = $overdueUnits . ' jam';
+                $fineLabel    = '/jam';
+            }
+            $estimatedFine = $overdueUnits * $fineAmount;
         @endphp
         @if($estimatedFine > 0)
             <div class="bg-red-50 border border-red-200 rounded-2xl p-5 shadow-sm">
@@ -65,7 +82,7 @@
                         <h3 class="font-bold text-red-800 text-lg">Peringatan: Denda Berjalan</h3>
                         <p class="text-red-700 text-sm mt-1 leading-relaxed">
                             Peminjaman Anda telah melewati batas waktu pengembalian pada <strong>{{ $deadline->format('d M Y H:i') }} WIB</strong>. 
-                            Anda telah terlambat selama <strong>{{ $overdueHours }} jam</strong>, dengan estimasi denda saat ini sebesar <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
+                            Anda telah terlambat selama <strong>{{ $overdueLabel }}</strong>, dengan estimasi denda <strong>(Rp {{ number_format($fineAmount, 0, ',', '.') }}{{ $fineLabel }})</strong> saat ini sebesar <strong class="text-red-800 text-base">Rp {{ number_format($estimatedFine, 0, ',', '.') }}</strong>.
                         </p>
                         <p class="text-red-600 text-xs mt-2 italic font-semibold">
                             *Harap SEGERA mengembalikan barang ke Laboratorium agar denda tidak terus bertambah, lalu bayar tagihan resmi Anda melalui aplikasi.

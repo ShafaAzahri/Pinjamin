@@ -54,11 +54,16 @@
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Durasi Peminjaman</label>
                 <div class="flex items-center gap-3">
-                    <input type="number" name="loan_duration_hours" value="{{ old('loan_duration_hours', $maxDuration) }}" min="1" max="{{ $maxDuration }}" required
-                        class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration_hours') border-red-400 @enderror">
-                    <span class="text-sm text-slate-500">jam (maks. {{ $maxDuration }} jam)</span>
+                    <input type="number" name="loan_duration" value="{{ old('loan_duration', 1) }}" min="1" required
+                        class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration') border-red-400 @enderror">
+                    <select name="loan_duration_type" class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration_type') border-red-400 @enderror">
+                        <option value="hours" {{ old('loan_duration_type') === 'hours' ? 'selected' : '' }}>Jam</option>
+                        <option value="days" {{ old('loan_duration_type') === 'days' ? 'selected' : '' }}>Hari</option>
+                    </select>
+                    <span class="text-sm text-slate-500">(Maks. {{ $maxDuration }} jam total)</span>
                 </div>
-                @error('loan_duration_hours') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                @error('loan_duration') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                @error('loan_duration_type') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">

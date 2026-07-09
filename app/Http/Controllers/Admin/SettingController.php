@@ -20,12 +20,13 @@ class SettingController extends WebApiController
     {
         $request->validate([
             'max_loan_duration'  => 'required|integer|min:1|max:72',
-            'fine_per_hour'      => 'required|integer|min:0|max:100000',
+            'fine_amount'        => 'required|integer|min:0|max:1000000',
+            'fine_type'          => 'required|in:per_hour,per_day',
             'max_items_borrowed' => 'required|integer|min:1|max:10',
         ]);
 
         $response = $this->callApi('PUT', '/api/admin/settings', $request->only([
-            'max_loan_duration', 'fine_per_hour', 'max_items_borrowed'
+            'max_loan_duration', 'fine_amount', 'fine_type', 'max_items_borrowed'
         ]));
 
         if (isset($response['message'])) {

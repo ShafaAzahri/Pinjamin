@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Loan extends Model
 {
-    protected $fillable = ['user_id', 'status', 'loan_duration_hours', 'approved_by', 'approved_at', 'returned_at'];
+    protected $fillable = ['user_id', 'status', 'loan_duration', 'loan_duration_type', 'approved_by', 'approved_at', 'returned_at'];
 
     protected $casts = [
         'approved_at' => 'datetime',

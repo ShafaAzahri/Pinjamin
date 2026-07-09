@@ -25,16 +25,22 @@
                 @error('max_loan_duration') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
-            <!-- Fine per Hour -->
+            <!-- Fine Calculation -->
             <div>
-                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tarif Denda per Jam</label>
+                <label class="block text-sm font-semibold text-slate-700 mb-1.5">Tarif Denda Keterlambatan</label>
                 <div class="flex items-center gap-3">
                     <span class="text-sm text-slate-500 font-medium">Rp</span>
-                    <input type="number" name="fine_per_hour" value="{{ $settings['fine_per_hour']->value ?? 5000 }}" min="0" max="100000" required
-                        class="w-40 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition @error('fine_per_hour') border-red-400 @enderror">
+                    <input type="number" name="fine_amount" value="{{ $settings['fine_amount']->value ?? 5000 }}" min="0" max="1000000" required
+                        class="w-40 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition @error('fine_amount') border-red-400 @enderror">
+                    <span class="text-sm text-slate-500 font-medium">/</span>
+                    <select name="fine_type" class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition @error('fine_type') border-red-400 @enderror">
+                        <option value="per_hour" {{ ($settings['fine_type']->value ?? 'per_hour') === 'per_hour' ? 'selected' : '' }}>Jam</option>
+                        <option value="per_day" {{ ($settings['fine_type']->value ?? 'per_hour') === 'per_day' ? 'selected' : '' }}>Hari</option>
+                    </select>
                 </div>
-                <p class="text-xs text-slate-400 mt-1">{{ $settings['fine_per_hour']->description ?? '' }}</p>
-                @error('fine_per_hour') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                <p class="text-xs text-slate-400 mt-1">{{ $settings['fine_type']->description ?? 'Tentukan nominal denda dan satuannya (per jam atau per hari)' }}</p>
+                @error('fine_amount') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
+                @error('fine_type') <p class="text-xs text-red-500 mt-1">{{ $message }}</p> @enderror
             </div>
 
             <!-- Max Items -->

@@ -86,8 +86,9 @@ class CatalogController extends WebApiController
 
         // Jalankan logic API dengan mock request instance secara langsung
         $apiRequest = Request::create('/api/cart/checkout', 'POST', [
-            'item_unit_ids' => array_values($cart),
-            'loan_duration_hours' => (int) $request->input('loan_duration_hours')
+            'item_unit_ids'      => array_values($cart),
+            'loan_duration'      => (int) $request->input('loan_duration'),
+            'loan_duration_type' => $request->input('loan_duration_type', 'hours'),
         ]);
         $apiRequest->setUserResolver(fn() => auth()->user());
 
