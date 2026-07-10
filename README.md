@@ -129,7 +129,7 @@ Selesai! Sekarang Anda dapat mengakses aplikasinya melalui web browser pada alam
 - **SPA Navigation:** Hotwire Turbo 8
 - **PDF Generator:** Barryvdh/DomPDF
 - **Payment Gateway:** Midtrans Snap
-- **Authentication:** Laravel Socialite (Google SSO)
+- **Authentication:** Laravel Sanctum (Core Auth) & Laravel Socialite (Google SSO)
 
 ---
 *Dibuat untuk Tugas / Skripsi Politeknik Negeri Semarang.*
