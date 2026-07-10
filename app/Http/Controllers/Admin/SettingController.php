@@ -49,16 +49,21 @@ class SettingController extends WebApiController
     {
         \Log::info('Mencoba menyalakan server WhatsApp...');
 
-        // Cek apakah port 3000 sudah terpakai
-        $connection = @fsockopen('127.0.0.1', 3000);
+        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
+        $parsedUrl = parse_url($whatsappUrl);
+        $host = $parsedUrl['host'] ?? '127.0.0.1';
+        $port = $parsedUrl['port'] ?? 3000;
+
+        // Cek apakah port server WhatsApp sudah terpakai
+        $connection = @fsockopen($host, $port, $errno, $errstr, 2);
         if (is_resource($connection)) {
             fclose($connection);
-            \Log::warning('Gagal menyalakan server WA: Port 3000 sudah terpakai.');
+            \Log::warning("Gagal menyalakan server WA: Port {$port} pada {$host} sudah terpakai.");
             return back()->with('success', 'Server WhatsApp sudah berjalan.');
         }
 
         $path = base_path('whatsapp-server');
-        \Log::info('Directory target WhatsApp:', ['path' => $path]);
+        \Log::info("Directory target WhatsApp: {$path}");
 
         // Ganti working directory PHP sementara ke folder whatsapp-server
         $oldPath = getcwd();
