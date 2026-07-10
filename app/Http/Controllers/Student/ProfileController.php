@@ -48,6 +48,11 @@ class ProfileController extends Controller
         // Picu verifikasi AI di latar belakang (asinkron)
         \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $user->name);
 
+        // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+        $php = PHP_BINARY;
+        $artisan = base_path('artisan');
+        \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+
         $msg = 'Profil berhasil dilengkapi. KTM Anda sedang diverifikasi oleh AI di latar belakang. Silakan tunggu beberapa saat.';
 
         return redirect('/catalog')->with('success', $msg);

@@ -83,6 +83,11 @@ class AuthController extends Controller
         // Picu verifikasi AI di latar belakang (asinkron)
         \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $request->name);
 
+        // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+        $php = PHP_BINARY;
+        $artisan = base_path('artisan');
+        \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+
         $msg = 'Pendaftaran berhasil! KTM Anda sedang diverifikasi oleh AI di latar belakang.';
 
         return response()->json([
@@ -186,6 +191,11 @@ class AuthController extends Controller
         if ($request->hasFile('ktm_photo')) {
             // Picu verifikasi AI di latar belakang (asinkron)
             \App\Jobs\VerifyKtmJob::dispatch($user, $path, $nim, $name);
+
+            // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+            $php = PHP_BINARY;
+            $artisan = base_path('artisan');
+            \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
         }
 
         $msg = 'Profil Anda berhasil diperbarui!';
