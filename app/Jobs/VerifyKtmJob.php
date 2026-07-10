@@ -43,6 +43,12 @@ class VerifyKtmJob implements ShouldQueue
                 'status' => 'aktif',
                 'rejection_reason' => null
             ]);
+
+            // Tambahkan Notifikasi Database
+            $this->user->notifications()->create([
+                'title' => 'Verifikasi KTM Berhasil',
+                'message' => 'Selamat, Kartu Tanda Mahasiswa (KTM) Anda berhasil diverifikasi secara otomatis oleh AI. Anda sekarang dapat melakukan peminjaman alat.'
+            ]);
         } else {
             // Jika gagal verifikasi AI, biarkan masuk antrean manual admin (status: menunggu_verifikasi)
             $this->user->update([

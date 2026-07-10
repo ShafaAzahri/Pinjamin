@@ -375,6 +375,13 @@ class AdminController extends Controller
                 'status' => 'aktif',
                 'rejection_reason' => null
             ]);
+            
+            // Tambahkan Notifikasi Database
+            $user->notifications()->create([
+                'title' => 'Verifikasi KTM Berhasil',
+                'message' => 'Selamat, Kartu Tanda Mahasiswa (KTM) Anda telah disetujui dan diverifikasi oleh Admin. Anda sekarang dapat melakukan peminjaman alat.'
+            ]);
+
             $msg = "Akun {$user->name} berhasil diverifikasi.";
         } else {
             $reason = $request->input('reason', 'Data tidak sesuai atau buram.');
@@ -382,8 +389,15 @@ class AdminController extends Controller
                 'status' => 'ditolak',
                 'rejection_reason' => $reason
             ]);
-            $msg = "Akun {$user->name} ditolak.";
 
+            // Tambahkan Notifikasi Database
+            $user->notifications()->create([
+                'title' => 'Verifikasi KTM Ditolak',
+                'message' => "Maaf, verifikasi KTM Anda ditolak oleh Admin. Alasan: {$reason}. Silakan unggah kembali KTM Anda dengan data yang benar."
+            ]);
+
+            $msg = "Akun {$user->name} ditolak.";
+ 
             // Kirim WhatsApp (jika ada nomor HP)
             if ($user->phone) {
                 $message = "Halo *{$user->name}*,\n\n"
