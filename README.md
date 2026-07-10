@@ -80,7 +80,7 @@ php artisan key:generate
 
 Ubah pengaturan database dan URL Anda di dalam file `.env`:
 ```env
-APP_URL=http://localhost/Pinjamin/public
+APP_URL=http://pinjamin.test
 
 # Jika menggunakan database MySQL:
 DB_CONNECTION=mysql
@@ -99,7 +99,7 @@ Agar fitur *Login with Google* berfungsi, tambahkan API kredensial dari **Google
 ```env
 GOOGLE_CLIENT_ID=masukkan_client_id_anda
 GOOGLE_CLIENT_SECRET=masukkan_secret_anda
-GOOGLE_REDIRECT_URI=http://localhost/Pinjamin/public/auth/google/callback
+GOOGLE_REDIRECT_URI=http://pinjamin.test/auth/google/callback
 ```
 
 ### 6. Migrasi & Seeder Database
@@ -116,7 +116,7 @@ npm run dev
 ```
 
 Selesai! Sekarang Anda dapat mengakses aplikasinya melalui web browser pada alamat:
-`http://localhost/Pinjamin/public/`
+`http://pinjamin.test/`
 
 ---
 
