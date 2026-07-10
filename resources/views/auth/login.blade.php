@@ -7,34 +7,24 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="h-full flex font-sans antialiased">
+<body class="h-full flex items-center justify-center font-sans antialiased bg-slate-50 relative overflow-hidden">
     
-    <!-- Left: Branding (Hidden on mobile) -->
-    <div class="hidden lg:flex w-1/2 bg-slate-50 flex-col items-center justify-center p-12 relative overflow-hidden">
-        <!-- Decoration -->
-        <div class="absolute inset-0 bg-gradient-to-br from-teal-50 to-slate-100 opacity-90"></div>
-        <div class="absolute -top-32 -right-32 w-96 h-96 bg-teal-200/50 rounded-full blur-3xl mix-blend-multiply"></div>
-        <div class="absolute -bottom-32 -left-32 w-96 h-96 bg-blue-200/50 rounded-full blur-3xl mix-blend-multiply"></div>
+    <!-- Background Decor -->
+    <div class="absolute -top-40 -right-40 w-96 h-96 bg-teal-200/40 rounded-full blur-3xl mix-blend-multiply pointer-events-none"></div>
+    <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-blue-200/40 rounded-full blur-3xl mix-blend-multiply pointer-events-none"></div>
 
-        <div class="relative z-10 flex flex-col items-center">
-            <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-white mb-8">
-                <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-48 w-auto">
+    <div class="w-full max-w-md p-6 relative z-10">
+        <!-- Brand logo / header -->
+        <div class="flex flex-col items-center mb-8">
+            <div class="bg-white p-4 sm:p-5 rounded-[2rem] shadow-xl shadow-slate-200/50 border border-white mb-4">
+                <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-28 w-auto">
             </div>
-            <p class="text-slate-600 font-medium text-lg text-center max-w-sm">Sistem Peminjaman Alat Laboratorium Elektro yang Mudah, Cepat, dan Aman.</p>
+            <p class="text-sm font-medium text-slate-500 mt-1 text-center">Sistem Peminjaman Alat Laboratorium Elektro</p>
         </div>
-    </div>
 
-    <!-- Right: Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center bg-white p-6 sm:p-12 shadow-[0_0_40px_rgba(0,0,0,0.05)] z-10">
-        <div class="w-full max-w-md">
-            
-            <!-- Mobile Logo -->
-            <div class="flex lg:hidden flex-col items-center mb-8">
-                <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-24 w-auto mb-2">
-            </div>
-
-            <h2 class="text-3xl font-black text-slate-800 mb-2 tracking-tight">Masuk</h2>
-            <p class="text-slate-500 mb-8 font-medium">Selamat datang kembali! Silakan masuk ke akun Anda.</p>
+        <!-- Login Card -->
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl border border-slate-100 shadow-xl shadow-slate-100/40 p-8">
+            <h2 class="text-2xl font-black text-slate-800 mb-6 text-center tracking-tight">Masuk Akun</h2>
 
             @if(session('success'))
                 <div class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-sm font-semibold flex items-center shadow-sm">
@@ -54,19 +44,19 @@
                 </div>
             @endif
 
-            <form action="/login" method="POST" class="space-y-6">
+            <form action="/login" method="POST" class="space-y-5">
                 @csrf
                 <div>
                     <label for="email" class="block text-sm font-bold text-slate-700 mb-2">Alamat Email</label>
                     <input type="email" id="email" name="email" value="{{ old('email') }}" required 
-                        class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-white placeholder-slate-400 font-medium shadow-sm"
+                        class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-slate-50/50 placeholder-slate-400 font-medium"
                         placeholder="nama@email.com">
                 </div>
 
                 <div>
                     <label for="password" class="block text-sm font-bold text-slate-700 mb-2">Password</label>
                     <input type="password" id="password" name="password" required 
-                        class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-white placeholder-slate-400 font-medium shadow-sm"
+                        class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-slate-50/50 placeholder-slate-400 font-medium"
                         placeholder="••••••••">
                 </div>
 
@@ -79,20 +69,17 @@
                 </div>
 
                 <button type="submit" 
-                    class="w-full py-4 px-4 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-black rounded-2xl shadow-lg shadow-teal-600/30 transition-all duration-200 transform hover:-translate-y-0.5">
-                    Masuk ke Sistem
+                    class="w-full py-3.5 px-4 bg-teal-600 hover:bg-teal-700 active:bg-teal-800 text-white font-black rounded-2xl shadow-lg shadow-teal-600/30 transition-all duration-200 mt-2">
+                    Masuk Sekarang
                 </button>
             </form>
-            
-            <div class="mt-8 pt-8 border-t border-slate-100">
-                <p class="text-center text-sm font-medium text-slate-500">
-                    Belum punya akun? 
-                    <a href="/register" class="font-bold text-teal-600 hover:text-teal-700 hover:underline">Daftar sekarang</a>
-                </p>
-            </div>
         </div>
+        
+        <p class="text-center text-sm font-medium text-slate-500 mt-8">
+            Belum punya akun? 
+            <a href="/register" class="font-bold text-teal-600 hover:text-teal-700 hover:underline">Daftar sekarang</a>
+        </p>
     </div>
-    
     <x-page-loader />
 </body>
 </html>
