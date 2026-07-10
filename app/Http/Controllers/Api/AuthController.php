@@ -64,13 +64,10 @@ class AuthController extends Controller
             'password'  => 'required|string|min:8|confirmed',
             'nim'       => 'required|string|max:50|unique:users',
             'prodi'     => 'required|string|max:100',
-            'ktm_photo' => 'nullable|image|max:2048',
+            'ktm_photo' => 'required|image|max:2048',
         ]);
 
-        $path = null;
-        if ($request->hasFile('ktm_photo')) {
-            $path = $request->file('ktm_photo')->store('ktm', 'public');
-        }
+        $path = $request->file('ktm_photo')->store('ktm', 'public');
 
         $user = User::create([
             'name'      => $request->name,

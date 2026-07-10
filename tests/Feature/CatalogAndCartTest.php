@@ -106,14 +106,16 @@ class CatalogAndCartTest extends TestCase
         $this->actingAs($this->student)->post('/catalog/add-to-cart', ['item_unit_id' => $this->unit2->id]);
 
         $response = $this->actingAs($this->student)->post('/cart/checkout', [
-            'loan_duration_hours' => 6,
+            'loan_duration' => 6,
+            'loan_duration_type' => 'hours',
         ]);
 
         $response->assertRedirect('/loans');
         $this->assertDatabaseHas('loans', [
             'user_id' => $this->student->id,
             'status' => 'menunggu_persetujuan',
-            'loan_duration_hours' => 6,
+            'loan_duration' => 6,
+            'loan_duration_type' => 'hours',
         ]);
         $this->assertNull(session('cart'));
     }
@@ -134,7 +136,8 @@ class CatalogAndCartTest extends TestCase
         $this->actingAs($studentWithoutKtm)->post('/catalog/add-to-cart', ['item_unit_id' => $this->unit1->id]);
 
         $response = $this->actingAs($studentWithoutKtm)->post('/cart/checkout', [
-            'loan_duration_hours' => 6,
+            'loan_duration' => 6,
+            'loan_duration_type' => 'hours',
         ]);
 
         $response->assertRedirect();
@@ -159,7 +162,8 @@ class CatalogAndCartTest extends TestCase
         $this->actingAs($unverifiedStudent)->post('/catalog/add-to-cart', ['item_unit_id' => $this->unit1->id]);
 
         $response = $this->actingAs($unverifiedStudent)->post('/cart/checkout', [
-            'loan_duration_hours' => 6,
+            'loan_duration' => 6,
+            'loan_duration_type' => 'hours',
         ]);
 
         $response->assertRedirect();

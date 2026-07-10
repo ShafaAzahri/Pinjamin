@@ -51,7 +51,8 @@ class FinePaymentTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'selesai',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
         ]);
 
         $this->fine = Fine::create([
@@ -61,9 +62,10 @@ class FinePaymentTest extends TestCase
             'status' => 'belum_dibayar',
         ]);
 
-        Setting::create(['key' => 'max_loan_duration', 'value' => '8']);
-        Setting::create(['key' => 'fine_per_hour', 'value' => '5000']);
-        Setting::create(['key' => 'max_items_borrowed', 'value' => '3']);
+        Setting::updateOrCreate(['key' => 'max_loan_duration'], ['value' => '8']);
+        Setting::updateOrCreate(['key' => 'fine_amount'], ['value' => '5000']);
+        Setting::updateOrCreate(['key' => 'fine_type'], ['value' => 'per_hour']);
+        Setting::updateOrCreate(['key' => 'max_items_borrowed'], ['value' => '3']);
     }
 
     public function test_student_can_get_snap_token()
@@ -136,15 +138,19 @@ class FinePaymentTest extends TestCase
     public function test_admin_can_update_settings()
     {
         $response = $this->actingAs($this->admin)->put('/admin/settings', [
-            'max_loan_duration' => 12,
-            'fine_per_hour' => 10000,
-            'max_items_borrowed' => 5,
+            'max_loan_duration'      => 12,
+            'max_loan_duration_type' => 'hours',
+            'fine_amount'            => 10000,
+            'fine_type'              => 'per_hour',
+            'max_items_borrowed'     => 5,
         ]);
 
         $response->assertRedirect();
 
         $this->assertDatabaseHas('settings', ['key' => 'max_loan_duration', 'value' => '12']);
-        $this->assertDatabaseHas('settings', ['key' => 'fine_per_hour', 'value' => '10000']);
+        $this->assertDatabaseHas('settings', ['key' => 'max_loan_duration_type', 'value' => 'hours']);
+        $this->assertDatabaseHas('settings', ['key' => 'fine_amount', 'value' => '10000']);
+        $this->assertDatabaseHas('settings', ['key' => 'fine_type', 'value' => 'per_hour']);
         $this->assertDatabaseHas('settings', ['key' => 'max_items_borrowed', 'value' => '5']);
     }
 }

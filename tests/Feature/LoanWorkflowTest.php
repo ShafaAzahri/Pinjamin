@@ -63,9 +63,11 @@ class LoanWorkflowTest extends TestCase
             'status' => 'tersedia',
         ]);
 
-        Setting::create(['key' => 'max_loan_duration', 'value' => '8']);
-        Setting::create(['key' => 'fine_per_hour', 'value' => '5000']);
-        Setting::create(['key' => 'max_items_borrowed', 'value' => '3']);
+        Setting::updateOrCreate(['key' => 'max_loan_duration'], ['value' => '8']);
+        Setting::updateOrCreate(['key' => 'max_loan_duration_type'], ['value' => 'hours']);
+        Setting::updateOrCreate(['key' => 'fine_amount'], ['value' => '5000']);
+        Setting::updateOrCreate(['key' => 'fine_type'], ['value' => 'per_hour']);
+        Setting::updateOrCreate(['key' => 'max_items_borrowed'], ['value' => '3']);
     }
 
     public function test_admin_can_approve_loan()
@@ -73,7 +75,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'menunggu_persetujuan',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
         ]);
 
         $loanItem = LoanItem::create([
@@ -106,7 +109,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'menunggu_persetujuan',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
         ]);
 
         $loanItem = LoanItem::create([
@@ -139,7 +143,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'aktif',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
             'approved_by' => $this->admin->id,
             'approved_at' => now(),
         ]);
@@ -174,7 +179,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'menunggu_verifikasi_kembali',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
             'approved_by' => $this->admin->id,
             'approved_at' => $approvedAt,
         ]);
@@ -221,7 +227,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'menunggu_verifikasi_kembali',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
             'approved_by' => $this->admin->id,
             'approved_at' => now(),
         ]);
@@ -262,7 +269,8 @@ class LoanWorkflowTest extends TestCase
         $loan = Loan::create([
             'user_id' => $this->student->id,
             'status' => 'selesai',
-            'loan_duration_hours' => 8,
+            'loan_duration' => 8,
+            'loan_duration_type' => 'hours',
         ]);
 
         $response = $this->actingAs($this->admin)->get('/admin/loans/report');
