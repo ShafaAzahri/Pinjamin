@@ -143,5 +143,29 @@
     </div>
 
     <div class="mt-6">{{ $items->links() }}</div>
+
+    <!-- Bottom CTA / Info Section -->
+    <div class="mt-16 bg-teal-50 rounded-3xl p-8 sm:p-12 border border-teal-100 flex flex-col md:flex-row items-center justify-between gap-6 shadow-sm relative overflow-hidden">
+        <!-- Decorative subtle background -->
+        <div class="absolute -right-8 -top-8 text-teal-200/50">
+            <svg width="150" height="150" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16z" />
+            </svg>
+        </div>
+        <div class="relative z-10">
+            <h3 class="text-xl sm:text-2xl font-extrabold text-teal-900 mb-2 tracking-tight">Butuh Bantuan Memilih Alat?</h3>
+            <p class="text-teal-700 max-w-2xl text-sm sm:text-base">
+                Jika Anda kesulitan menemukan alat yang sesuai untuk kebutuhan praktikum atau penelitian, jangan ragu untuk berkonsultasi dengan laboran kami untuk mendapatkan rekomendasi yang tepat.
+            </p>
+        </div>
+        <div class="relative z-10 shrink-0">
+            <a href="mailto:admin@pinjamin.test" class="px-6 py-3.5 bg-teal-600 text-white rounded-xl text-sm font-bold hover:bg-teal-700 transition shadow-md flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+                Hubungi Laboran
+            </a>
+        </div>
+    </div>
 </div>
 @endsection
