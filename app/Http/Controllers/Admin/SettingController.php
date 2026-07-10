@@ -55,13 +55,15 @@ class SettingController extends WebApiController
         }
 
         $path = base_path('whatsapp-server');
+        $batPath = base_path('start-whatsapp.bat');
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // Windows: Jalankan node index.js di background secara terpisah
-            pclose(popen("start /B node \"{$path}/index.js\"", "r"));
+            // Windows: Jalankan bat file di background dengan CMD untuk memastikan working directory benar
+            // Kita gunakan popen dengan cmd /c agar berjalan terpisah
+            pclose(popen("start /B cmd /c \"cd /d \"" . base_path() . "\" && start-whatsapp.bat\"", "r"));
         } else {
             // Linux/macOS
-            exec("node \"{$path}/index.js\" > /dev/null 2>&1 &");
+            exec("cd \"{$path}\" && node index.js > /dev/null 2>&1 &");
         }
 
         return back()->with('success', 'Server WhatsApp berhasil dinyalakan di latar belakang.');
