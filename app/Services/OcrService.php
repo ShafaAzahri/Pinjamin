@@ -40,58 +40,32 @@ class OcrService
                 . "Kembalikan respon hanya dalam format JSON murni (tanpa markdown atau teks tambahan) dengan struktur berikut: "
                 . '{"is_valid_ktm": true/false, "is_match": true/false, "reason": "penjelasan singkat"}';
 
-            // Endpoint 9Router Lokal (berdasarkan screenshot)
-            $endpoint = 'http://localhost:20128/v1/chat/completions';
+            // Endpoint Google AI Studio Gemini API
+            $endpoint = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent?key=' . env('AI_API_KEY');
 
-            // Kita menggunakan model Gemini yang tersedia di 9Router
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Authorization' => 'Bearer ' . env('AI_API_KEY', 'dummy-key')
-            ])->timeout(90)->post($endpoint, [
-                        'model' => 'oc/mimo-v2.5-free', // Model Gemini dari 9Router
-                        'messages' => [
+            $response = Http::withoutVerifying()->timeout(90)->post($endpoint, [
+                'contents' => [
+                    [
+                        'parts' => [
                             [
-                                'role' => 'user',
-                                'content' => [
-                                    [
-                                        'type' => 'text',
-                                        'text' => $prompt
-                                    ],
-                                    [
-                                        'type' => 'image_url',
-                                        'image_url' => [
-                                            'url' => $base64Image
-                                        ]
-                                    ]
+                                'text' => $prompt
+                            ],
+                            [
+                                'inlineData' => [
+                                    'mimeType' => $mimeType,
+                                    'data' => $imageData
                                 ]
                             ]
-                        ],
-                        'temperature' => 0.1, // Agar AI tidak berhalusinasi
-                        'max_tokens' => 2000, // Diperbesar karena model Gemini agent menggunakan reasoning tokens
-                        'stream' => false,    // Wajib dimatikan agar respon tidak berbentuk 'data: ...'
-                    ]);
+                        ]
+                    ]
+                ],
+                'generationConfig' => [
+                    'responseMimeType' => 'application/json'
+                ]
+            ]);
 
             if ($response->successful()) {
-                $body = $response->body();
-
-                // Jika server memaksa return stream (SSE), kita ekstrak isinya
-                if (str_contains($body, 'data: {"id"')) {
-                    $content = '';
-                    $lines = explode("\n", $body);
-                    foreach ($lines as $line) {
-                        if (str_starts_with($line, 'data: ')) {
-                            $jsonStr = substr($line, 6);
-                            if (trim($jsonStr) === '[DONE]')
-                                continue;
-                            $chunk = json_decode($jsonStr, true);
-                            if (isset($chunk['choices'][0]['delta']['content'])) {
-                                $content .= $chunk['choices'][0]['delta']['content'];
-                            }
-                        }
-                    }
-                } else {
-                    $content = $response->json('choices.0.message.content');
-                }
+                $content = $response->json('candidates.0.content.parts.0.text');
 
                 // Bersihkan respon jika AI masih mengembalikan markdown block ```json ... ```
                 $content = preg_replace('/```json/i', '', $content);

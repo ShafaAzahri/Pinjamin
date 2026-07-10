@@ -17,10 +17,14 @@ class AuthControllerTest extends TestCase
         Storage::fake('public');
         \Illuminate\Support\Facades\Http::fake([
             '*' => \Illuminate\Support\Facades\Http::response([
-                'choices' => [
+                'candidates' => [
                     [
-                        'message' => [
-                            'content' => '{"is_valid_ktm": false, "is_match": false, "reason": "Terjadi kesalahan saat memproses gambar dengan AI."}'
+                        'content' => [
+                            'parts' => [
+                                [
+                                    'text' => '{"is_valid_ktm": false, "is_match": false, "reason": "Terjadi kesalahan saat memproses gambar dengan AI."}'
+                                ]
+                            ]
                         ]
                     ]
                 ]
