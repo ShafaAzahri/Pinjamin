@@ -18,6 +18,21 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasApiTokens, HasFactory, Notifiable;
 
+    protected static function booted()
+    {
+        static::deleting(function ($user) {
+            // Hapus foto KTM dari storage jika ada
+            if ($user->ktm_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->ktm_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->ktm_photo);
+            }
+            
+            // Hapus foto profil dari storage jika ada
+            if ($user->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo);
+            }
+        });
+    }
+
     public function loans()
     {
         return $this->hasMany(Loan::class);
