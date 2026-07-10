@@ -53,15 +53,28 @@ class DashboardController extends WebApiController
     {
         $user = User::findOrFail($id);
         
-        // Panggil endpoint API Admin secara internal
-        $response = $this->callApi('POST', "/api/admin/users/{$user->id}/verify", [
-            'action' => $request->input('action')
-        ]);
-
         if ($request->input('action') === 'reject') {
-            $user->delete(); // maintain original delete-on-reject behavior
-            return back()->with('success', "Pendaftaran mahasiswa {$user->name} ditolak dan akun dihapus.");
+            $reason = $request->input('reason', 'Data tidak sesuai atau buram.');
+            
+            // Kirim WhatsApp sebelum user dihapus (jika ada nomor HP)
+            if ($user->phone) {
+                $message = "Halo *{$user->name}*,\n\n"
+                         . "Mohon maaf, pendaftaran akun Pinjamin Anda *DITOLAK* oleh Admin.\n\n"
+                         . "Alasan: _{$reason}_\n\n"
+                         . "Silakan mendaftar ulang menggunakan data dan foto KTM yang benar. Terima kasih!";
+                \App\Services\WhatsAppService::sendMessage($user->phone, $message);
+            }
+
+            // Panggil endpoint API Admin secara internal untuk logging (opsional) atau langsung hapus
+            // Karena kita butuh custom message, kita hapus manual saja
+            $user->delete(); 
+            return back()->with('success', "Pendaftaran mahasiswa {$user->name} ditolak dan notifikasi penolakan telah dikirim ke WA.");
         }
+
+        // Panggil endpoint API Admin secara internal untuk approve
+        $response = $this->callApi('POST', "/api/admin/users/{$user->id}/verify", [
+            'action' => 'approve'
+        ]);
 
         return back()->with('success', $response['message'] ?? 'Status berhasil diubah.');
     }

@@ -59,10 +59,12 @@
                                             Setujui Akun
                                         </button>
                                     </form>
-                                    <form action="{{ route('admin.users.verify', $pUser->id) }}" method="POST">
+                                    <form id="form-reject-{{$pUser->id}}" action="{{ route('admin.users.verify', $pUser->id) }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="action" value="reject">
-                                        <button type="submit" 
+                                        <input type="hidden" name="reason" id="reject-reason-{{$pUser->id}}">
+                                        <button type="button" 
+                                            onclick="const reason = prompt('Masukkan alasan penolakan untuk {{$pUser->name}}:'); if(reason) { document.getElementById('reject-reason-{{$pUser->id}}').value = reason; document.getElementById('form-reject-{{$pUser->id}}').submit(); }"
                                             class="px-4 py-2 bg-slate-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 active:scale-[0.98] text-slate-500 text-xs font-bold rounded-xl border border-slate-200/50 transition">
                                             Tolak & Hapus
                                         </button>
