@@ -175,18 +175,42 @@ class AuthController extends Controller
         if ($request->hasFile('ktm_photo')) {
             $path = $request->file('ktm_photo')->store('ktm', 'public');
             $data['ktm_photo'] = $path;
+
+            // Jalankan verifikasi AI OCR
+            $nim = $user->nim;
+            $name = $request->input('name', $user->name);
+
+            $ocrResult = \App\Services\OcrService::verifyKtm($path, $nim, $name);
+            $status = ($ocrResult['is_match'] && $ocrResult['is_valid_ktm']) ? 'aktif' : 'menunggu_verifikasi';
+            
+            $data['status'] = $status;
+
+            if ($status === 'aktif') {
+                $data['rejection_reason'] = null;
+            }
         }
 
         $user->update($data);
 
+        $msg = 'Profil Anda berhasil diperbarui!';
+        if ($request->hasFile('ktm_photo')) {
+            $msg = $status === 'aktif' 
+                ? 'Profil diperbarui. KTM Anda terverifikasi oleh AI dan akun Anda aktif!'
+                : 'Profil diperbarui. Namun KTM tidak terverifikasi otomatis oleh AI (' . $ocrResult['reason'] . '). Menunggu verifikasi admin.';
+        }
+
         return response()->json([
-            'message' => 'Profil berhasil diperbarui.',
+            'message' => $msg,
             'user'    => [
                 'id'            => $user->id,
                 'name'          => $user->name,
                 'email'         => $user->email,
                 'phone'         => $user->phone,
+                'nim'           => $user->nim,
+                'prodi'         => $user->prodi,
+                'status'        => $user->status,
                 'profile_photo' => $user->profile_photo ? asset('storage/' . $user->profile_photo) : null,
+                'ktm_photo'     => $user->ktm_photo ? asset('storage/' . $user->ktm_photo) : null,
             ],
         ]);
     }
