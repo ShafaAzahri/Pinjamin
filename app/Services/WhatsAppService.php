@@ -16,32 +16,29 @@ class WhatsAppService
      */
     public static function send(string $target, string $message): bool
     {
-        $token = env('FONNTE_TOKEN');
-        $url = env('FONNTE_URL', 'https://api.fonnte.com/send');
+        $url = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
 
         // Format nomor agar diawali kode negara 62
         $formattedTarget = self::formatNumber($target);
 
-        if (empty($token) || $token === 'null') {
+        // Jika URL diset 'null' atau kosong, simulasikan pengiriman (untuk testing)
+        if (empty($url) || $url === 'null') {
             Log::info("WhatsApp Notification (Simulated LOG):\nTo: {$formattedTarget}\nMessage: {$message}");
             return true;
         }
 
         try {
-            $response = Http::withoutVerifying()->withHeaders([
-                'Authorization' => $token,
-            ])->post($url, [
+            $response = Http::withoutVerifying()->post($url, [
                 'target' => $formattedTarget,
                 'message' => $message,
-                'countryCode' => '62', // Default Indonesia jika input tetap pakai 0
             ]);
 
             if ($response->successful()) {
-                Log::info("WhatsApp Notification sent successfully to {$formattedTarget}");
+                Log::info("WhatsApp Notification sent successfully to {$formattedTarget} via Local Gateway");
                 return true;
             }
 
-            Log::error("Failed to send WhatsApp to {$formattedTarget}. Fonnte Response: " . $response->body());
+            Log::error("Failed to send WhatsApp to {$formattedTarget}. Gateway Response: " . $response->body());
             return false;
         } catch (\Exception $e) {
             Log::error("Exception occurred while sending WhatsApp to {$formattedTarget}: " . $e->getMessage());
