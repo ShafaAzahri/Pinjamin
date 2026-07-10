@@ -81,9 +81,23 @@ app.post('/send', async (req, res) => {
             });
         }
 
-        // whatsapp-web.js membutuhkan format 'nomor@c.us'
-        // 'target' dari Laravel sudah diformat ke '628xxx'
-        const chatId = `${target}@c.us`;
+        // Bersihkan karakter non-digit dari target just in case
+        let cleanTarget = target.replace(/\D/g, '');
+        if (cleanTarget.startsWith('0')) {
+            cleanTarget = '62' + cleanTarget.substring(1);
+        }
+
+        // Dapatkan ID resmi dari WhatsApp
+        const registeredUser = await client.getNumberId(cleanTarget);
+        
+        if (!registeredUser) {
+            return res.status(404).json({
+                status: 'error',
+                message: 'The phone number is not registered on WhatsApp.'
+            });
+        }
+
+        const chatId = registeredUser._serialized;
 
         const response = await client.sendMessage(chatId, message);
 
