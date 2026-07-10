@@ -65,6 +65,13 @@ class SettingController extends WebApiController
         $path = base_path('whatsapp-server');
         \Log::info("Directory target WhatsApp: {$path}");
 
+        // Diagnostik: Cek apakah node terinstal dan bisa diakses dari Apache
+        exec("node -v 2>&1", $nodeVerOut, $nodeVerErr);
+        \Log::info("Diagnostik Node -v dari web:", [
+            'output' => $nodeVerOut,
+            'exit_code' => $nodeVerErr
+        ]);
+
         // Ganti working directory PHP sementara ke folder whatsapp-server
         $oldPath = getcwd();
         chdir($path);
