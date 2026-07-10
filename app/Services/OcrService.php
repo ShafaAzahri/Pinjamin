@@ -41,13 +41,12 @@ class OcrService
                     . '{"is_valid_ktm": true/false, "is_match": true/false, "reason": "penjelasan singkat"}';
 
             // Endpoint 9Router Lokal (berdasarkan screenshot)
-            $endpoint = 'http://localhost:28128/v1/chat/completions';
+            $endpoint = 'http://127.0.0.1:28128/v1/chat/completions';
 
             // Kita menggunakan model Gemini yang tersedia di 9Router
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
-                // API Key opsional di 9Router lokal jika dimatikan
-                'Authorization' => 'Bearer dummy-key' 
+                'Authorization' => 'Bearer ' . env('AI_API_KEY', 'dummy-key')
             ])->post($endpoint, [
                 'model' => 'ag/gemini-3-flash', // Model Gemini dari 9Router
                 'messages' => [
