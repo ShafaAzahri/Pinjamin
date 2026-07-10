@@ -1,11 +1,11 @@
 @extends('layouts.admin')
 
-@section('title', 'WhatsApp Gateway')
+@section('title', 'Hubungkan ke Whatsapp')
 
 @section('content')
 <div class="w-full space-y-6" x-data="whatsappConnector()">
     <div>
-        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">WhatsApp Gateway</h2>
+        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Hubungkan ke Whatsapp</h2>
         <p class="text-sm text-slate-500 mt-1">Kelola koneksi sistem notifikasi otomatis WhatsApp</p>
     </div>
 
@@ -38,14 +38,17 @@
                     </div>
                     <div>
                         <h4 class="text-base font-bold text-slate-800">Gateway Offline</h4>
-                        <p class="text-xs text-slate-400 max-w-sm mt-1 mx-auto">Server NodeJS WhatsApp tidak berjalan atau tidak dapat dijangkau di URL gateway Anda.</p>
+                        <p class="text-xs text-slate-400 max-w-sm mt-1 mx-auto">Sistem belum terhubung ke WhatsApp Gateway server.</p>
                     </div>
-                    <div class="p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left text-xs text-slate-600 max-w-sm mx-auto space-y-1">
-                        <p class="font-bold text-slate-700">💡 Cara Menyalakan Server WA:</p>
-                        <p>1. Buka folder project Anda di CMD.</p>
-                        <p>2. Jalankan: <code class="bg-slate-200 px-1 py-0.5 rounded font-mono">start-whatsapp.bat</code></p>
-                        <p>3. Jika sudah menyala, halaman ini akan otomatis terhubung.</p>
-                    </div>
+                    <form action="{{ route('admin.whatsapp.start') }}" method="POST">
+                        @csrf
+                        <button type="submit" class="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white text-sm font-bold rounded-2xl shadow-lg shadow-emerald-600/20 transition duration-150 flex items-center gap-2 mx-auto">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8.288 15.038a5.25 5.25 0 017.424 0M5.106 11.856a9 9 0 0113.788 0m-16.608-3.18a12.75 12.75 0 0119.425 0M12 18.75a.75.75 0 110-1.5.75.75 0 010 1.5z"/>
+                            </svg>
+                            Hubungkan ke Whatsapp
+                        </button>
+                    </form>
                 </div>
 
                 <!-- State 3: Disconnected / Scan QR -->

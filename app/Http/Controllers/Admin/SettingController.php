@@ -44,4 +44,26 @@ class SettingController extends WebApiController
         
         return view('admin.settings.whatsapp', compact('whatsappBaseUrl'));
     }
+
+    public function startWhatsapp()
+    {
+        // Cek apakah port 3000 sudah terpakai
+        $connection = @fsockopen('127.0.0.1', 3000);
+        if (is_resource($connection)) {
+            fclose($connection);
+            return back()->with('success', 'Server WhatsApp sudah berjalan.');
+        }
+
+        $path = base_path('whatsapp-server');
+
+        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+            // Windows: Jalankan node index.js di background secara terpisah
+            pclose(popen("start /B node \"{$path}/index.js\"", "r"));
+        } else {
+            // Linux/macOS
+            exec("node \"{$path}/index.js\" > /dev/null 2>&1 &");
+        }
+
+        return back()->with('success', 'Server WhatsApp berhasil dinyalakan di latar belakang.');
+    }
 }

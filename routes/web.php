@@ -106,4 +106,5 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // WhatsApp Gateway
     Route::get('/whatsapp', [SettingController::class, 'whatsapp'])->name('whatsapp.index');
+    Route::post('/whatsapp/start', [SettingController::class, 'startWhatsapp'])->name('whatsapp.start');
 });
