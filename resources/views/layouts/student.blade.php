@@ -12,7 +12,7 @@
 
     <!-- Navigation Bar -->
     <nav class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-20">
             <div class="flex justify-between h-16 items-center">
                 <!-- Brand -->
                 <div class="flex items-center">
@@ -125,7 +125,7 @@
 
     <!-- Main Content -->
     <main class="flex-1">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-20 py-8">
             <!-- Flash Messages -->
             @if(session('success'))
                 <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 text-emerald-800 rounded-2xl flex items-center shadow-sm">
@@ -150,7 +150,7 @@
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-100 py-4">
-        <div class="max-w-7xl mx-auto px-4 text-center">
+        <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-20 text-center">
             <p class="text-xs text-slate-400">&copy; {{ date('Y') }} Pinjamin - Sistem Peminjaman Alat Lab. Politeknik Negeri Semarang.</p>
         </div>
     </footer>

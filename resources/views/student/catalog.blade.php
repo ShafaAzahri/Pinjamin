@@ -4,13 +4,54 @@
 
 @section('content')
 <div class="space-y-6">
-    <div>
-        <h2 class="text-3xl font-extrabold text-slate-800 tracking-tight">Katalog Alat Lab</h2>
-        <p class="text-sm text-slate-500 mt-1">Pilih alat yang ingin Anda pinjam</p>
+    <!-- Hero Banner -->
+    <div class="relative bg-gradient-to-br from-slate-900 to-teal-900 rounded-3xl overflow-hidden shadow-xl mb-8">
+        <!-- Decorative elements -->
+        <div class="absolute inset-0 opacity-20">
+            <svg class="absolute left-0 bottom-0 text-white w-64 h-64 -ml-16 -mb-16" fill="currentColor" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50" />
+            </svg>
+            <svg class="absolute right-0 top-0 text-teal-400 w-96 h-96 -mr-32 -mt-32" fill="currentColor" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="50" />
+            </svg>
+        </div>
+
+        <div class="relative z-10 px-6 py-12 sm:px-12 sm:py-16 md:py-20 flex flex-col items-center text-center">
+            <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+                Selamat Datang, {{ explode(' ', Auth::user()->name)[0] }}!
+            </h1>
+            <p class="text-teal-50 text-sm sm:text-base md:text-lg max-w-2xl mb-10 opacity-90">
+                Temukan dan pinjam berbagai peralatan laboratorium berkualitas untuk mendukung kegiatan praktikum dan penelitian Anda.
+            </p>
+
+            <!-- Search & Filter in Banner -->
+            <div class="w-full max-w-4xl bg-white/10 backdrop-blur-md p-2 sm:p-3 rounded-2xl border border-white/20 shadow-lg">
+                <form method="GET" class="flex flex-col sm:flex-row gap-3">
+                    <div class="flex-1 relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-4">
+                            <svg class="h-5 w-5 text-white/60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </span>
+                        <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama alat lab..."
+                            class="w-full pl-11 pr-4 py-3 sm:py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white/20 transition text-sm sm:text-base">
+                    </div>
+                    <select name="category" class="w-full sm:w-48 px-4 py-3 sm:py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-teal-400 focus:bg-white/20 transition text-sm sm:text-base [&>option]:text-slate-800">
+                        <option value="">Semua Kategori</option>
+                        @foreach($categories as $cat)
+                            <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                        @endforeach
+                    </select>
+                    <button type="submit" class="w-full sm:w-auto px-8 py-3 sm:py-4 bg-teal-500 text-white rounded-xl text-sm sm:text-base font-bold hover:bg-teal-400 focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition shadow-md">
+                        Cari Alat
+                    </button>
+                </form>
+            </div>
+        </div>
     </div>
 
     @if(!auth()->user()->ktm_photo)
-        <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl flex items-start shadow-sm">
+        <div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-2xl flex items-start shadow-sm">
             <svg class="w-5 h-5 mr-3 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
@@ -19,7 +60,7 @@
             </div>
         </div>
     @elseif(auth()->user()->status === 'menunggu_verifikasi')
-        <div class="p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl flex items-start shadow-sm">
+        <div class="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl flex items-start shadow-sm">
             <svg class="w-5 h-5 mr-3 text-blue-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -29,32 +70,8 @@
         </div>
     @endif
 
-    <!-- Search & Filter -->
-    <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-4 flex flex-wrap gap-4 items-center">
-        <form method="GET" class="flex-1 flex gap-3 items-center">
-            <div class="flex-1 relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                </span>
-                <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari alat..."
-                    class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition text-sm">
-            </div>
-            <select name="category" class="px-4 py-2.5 border border-slate-200 rounded-xl bg-slate-50/50 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500">
-                <option value="">Semua Kategori</option>
-                @foreach($categories as $cat)
-                    <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
-                @endforeach
-            </select>
-            <button type="submit" class="px-4 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition">
-                Cari
-            </button>
-        </form>
-    </div>
-
     <!-- Items Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-6">
         @forelse($items as $item)
             @php
                 $availableUnits = $item->units->where('status', 'tersedia')->where('condition', 'baik');
