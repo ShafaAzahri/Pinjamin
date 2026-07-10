@@ -53,12 +53,17 @@
             
             <div>
                 <label class="block text-sm font-semibold text-slate-700 mb-1.5">Durasi Peminjaman</label>
-                <div class="flex items-center gap-3">
-                    <input type="number" name="loan_duration" value="{{ old('loan_duration', 1) }}" min="1" required
-                        class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration') border-red-400 @enderror">
-                    <select name="loan_duration_type" class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration_type') border-red-400 @enderror">
-                        <option value="hours" {{ old('loan_duration_type') === 'hours' ? 'selected' : '' }}>Jam</option>
-                        <option value="days" {{ old('loan_duration_type') === 'days' ? 'selected' : '' }}>Hari</option>
+                <div class="flex items-center gap-3" x-data="{ 
+                    maxHours: {{ $maxDuration }}, 
+                    type: '{{ old('loan_duration_type', 'hours') }}',
+                    get maxAllowed() { return this.type === 'days' ? Math.floor(this.maxHours / 24) : this.maxHours; }
+                }">
+                    <input type="number" name="loan_duration" value="{{ old('loan_duration', 1) }}" min="1" :max="maxAllowed" required
+                        class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration') border-red-400 @enderror"
+                        x-on:input="$el.value = Math.min($el.value, maxAllowed)">
+                    <select name="loan_duration_type" x-model="type" class="w-32 px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 @error('loan_duration_type') border-red-400 @enderror">
+                        <option value="hours">Jam</option>
+                        <option value="days">Hari</option>
                     </select>
                     <span class="text-sm text-slate-500">(Maks. {{ $maxDuration }} jam total)</span>
                 </div>
