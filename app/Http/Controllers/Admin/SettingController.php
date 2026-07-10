@@ -55,16 +55,21 @@ class SettingController extends WebApiController
         }
 
         $path = base_path('whatsapp-server');
-        $batPath = base_path('start-whatsapp.bat');
+
+        // Ganti working directory PHP sementara ke folder whatsapp-server
+        $oldPath = getcwd();
+        chdir($path);
 
         if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // Windows: Jalankan bat file di background dengan CMD untuk memastikan working directory benar
-            // Kita gunakan popen dengan cmd /c agar berjalan terpisah
-            pclose(popen("start /B cmd /c \"cd /d \"" . base_path() . "\" && start-whatsapp.bat\"", "r"));
+            // Windows: Jalankan node index.js di background secara terpisah
+            pclose(popen("start /B node index.js", "r"));
         } else {
             // Linux/macOS
-            exec("cd \"{$path}\" && node index.js > /dev/null 2>&1 &");
+            exec("node index.js > /dev/null 2>&1 &");
         }
+
+        // Kembalikan working directory PHP ke semula
+        chdir($oldPath);
 
         return back()->with('success', 'Server WhatsApp berhasil dinyalakan di latar belakang.');
     }
