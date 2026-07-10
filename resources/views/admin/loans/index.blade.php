@@ -69,7 +69,7 @@
                                     <span class="text-[10px] text-slate-400">+{{ $loan->loanItems->count() - 2 }} lainnya</span>
                                 @endif
                             </td>
-                            <td class="py-4 px-6 text-xs font-semibold">{{ $loan->loan_duration_hours }} jam</td>
+                            <td class="py-4 px-6 text-xs font-semibold">{{ $loan->duration_label }}</td>
                             <td class="py-4 px-6 text-xs text-slate-400">{{ $loan->created_at->format('d M Y H:i') }}</td>
                             <td class="py-4 px-6">
                                 @php

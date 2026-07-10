@@ -36,7 +36,7 @@
             </div>
             <div>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Durasi</span>
-                <p class="font-bold text-slate-800">{{ $loan->loan_duration_hours }} jam</p>
+                <p class="font-bold text-slate-800">{{ $loan->duration_label }}</p>
             </div>
             <div>
                 <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Tanggal</span>

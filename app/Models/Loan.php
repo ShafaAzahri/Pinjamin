@@ -32,4 +32,10 @@ class Loan extends Model
     {
         return $this->hasMany(Fine::class);
     }
+
+    public function getDurationLabelAttribute()
+    {
+        $label = $this->loan_duration_type === 'days' ? 'hari' : 'jam';
+        return "{$this->loan_duration} {$label}";
+    }
 }
