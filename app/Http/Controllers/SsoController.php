@@ -19,6 +19,11 @@ class SsoController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
             
+            // Filter hanya mengizinkan email kampus (@mhs.polines.ac.id)
+            if (!str_ends_with($googleUser->getEmail(), '@mhs.polines.ac.id')) {
+                return redirect('/login')->withErrors(['email' => 'Gagal login. Anda harus menggunakan email kampus (@mhs.polines.ac.id).']);
+            }
+
             // Check if user exists by provider_id or email
             $user = User::where('email', $googleUser->getEmail())->first();
 
