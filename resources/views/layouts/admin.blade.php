@@ -14,8 +14,8 @@
     <aside class="w-64 min-w-[16rem] bg-slate-900 text-slate-300 flex flex-col justify-between shrink-0 shadow-xl shadow-slate-900/10">
         <div>
             <!-- Brand -->
-            <div class="h-24 flex items-center justify-center px-6 border-b border-slate-800">
-                <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-16 w-auto bg-white rounded-xl p-2 shadow-sm">
+            <div class="h-32 flex items-center justify-center px-6 border-b border-slate-800">
+                <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-24 w-auto bg-white rounded-xl p-2 shadow-sm">
             </div>
 
             <!-- Navigation -->

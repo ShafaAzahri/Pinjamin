@@ -11,7 +11,7 @@
     <div class="w-full max-w-lg p-6">
         <!-- Brand logo / header -->
         <div class="flex flex-col items-center mb-8">
-            <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-32 w-auto mb-2">
+            <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-48 w-auto mb-2">
             <p class="text-sm text-slate-500 mt-1">Daftar Akun Peminjaman Lab Elektro</p>
         </div>
 

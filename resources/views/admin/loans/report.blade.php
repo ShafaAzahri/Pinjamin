@@ -43,7 +43,7 @@
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-slate-100 pb-8 gap-6">
             <div>
                 <div class="flex items-center mb-3">
-                    <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-12 w-auto mr-3">
+                    <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-20 w-auto mr-3">
                 </div>
                 <h1 class="text-2xl font-black text-slate-900 tracking-tight">Laporan Aktivitas Peminjaman Alat</h1>
                 <p class="text-sm text-slate-400 mt-1">Laboratorium Elektro & Mikro kontroler Politeknik Negeri Semarang</p>

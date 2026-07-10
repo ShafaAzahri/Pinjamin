@@ -16,7 +16,7 @@
             <div class="flex justify-between h-16 items-center">
                 <!-- Brand -->
                 <a href="{{ route('student.catalog') }}" class="flex items-center">
-                    <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-10 w-auto">
+                    <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-14 w-auto">
                 </a>
 
                 <!-- Nav Links -->
