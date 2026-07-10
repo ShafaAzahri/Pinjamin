@@ -37,20 +37,18 @@ class ProfileController extends Controller
 
         $path = $request->file('ktm_photo')->store('ktm', 'public');
 
-        // OCR Verification via 9Router
-        $ocrResult = \App\Services\OcrService::verifyKtm($path, $request->nim, $user->name);
-        $status = ($ocrResult['is_match'] && $ocrResult['is_valid_ktm']) ? 'aktif' : 'menunggu_verifikasi';
-
+        // Update status ke 'menunggu_verifikasi' terlebih dahulu
         $user->update([
             'nim' => $request->nim,
             'prodi' => $request->prodi,
             'ktm_photo' => $path,
-            'status' => $status,
+            'status' => 'menunggu_verifikasi',
         ]);
 
-        $msg = $status === 'aktif' 
-            ? 'Profil berhasil dilengkapi. KTM Anda terverifikasi oleh AI dan akun Anda sudah aktif.' 
-            : 'Profil berhasil dilengkapi. Namun KTM tidak terverifikasi otomatis oleh AI (' . $ocrResult['reason'] . '). Akun menunggu verifikasi admin.';
+        // Picu verifikasi AI di latar belakang (asinkron)
+        \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $user->name);
+
+        $msg = 'Profil berhasil dilengkapi. KTM Anda sedang diverifikasi oleh AI di latar belakang. Silakan tunggu beberapa saat.';
 
         return redirect('/catalog')->with('success', $msg);
     }

@@ -69,10 +69,6 @@ class AuthController extends Controller
 
         $path = $request->file('ktm_photo')->store('ktm', 'public');
 
-        // OCR Verification via 9Router
-        $ocrResult = \App\Services\OcrService::verifyKtm($path, $request->nim, $request->name);
-        $status = ($ocrResult['is_match'] && $ocrResult['is_valid_ktm']) ? 'aktif' : 'menunggu_verifikasi';
-
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
@@ -81,12 +77,13 @@ class AuthController extends Controller
             'nim'       => $request->nim,
             'prodi'     => $request->prodi,
             'ktm_photo' => $path,
-            'status'    => $status,
+            'status'    => 'menunggu_verifikasi',
         ]);
 
-        $msg = $status === 'aktif' 
-            ? 'Pendaftaran berhasil! KTM Anda terverifikasi oleh AI dan akun Anda sudah aktif.' 
-            : 'Pendaftaran berhasil! Namun KTM tidak terverifikasi otomatis oleh AI (' . $ocrResult['reason'] . '). Akun menunggu verifikasi admin.';
+        // Picu verifikasi AI di latar belakang (asinkron)
+        \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $request->name);
+
+        $msg = 'Pendaftaran berhasil! KTM Anda sedang diverifikasi oleh AI di latar belakang.';
 
         return response()->json([
             'message' => $msg,
@@ -176,27 +173,24 @@ class AuthController extends Controller
             $path = $request->file('ktm_photo')->store('ktm', 'public');
             $data['ktm_photo'] = $path;
 
-            // Jalankan verifikasi AI OCR
+            // Set ke 'menunggu_verifikasi' agar dicek ulang oleh AI dan admin
+            $data['status'] = 'menunggu_verifikasi';
+
+            // Parameter verifikasi AI
             $nim = $user->nim;
             $name = $request->input('name', $user->name);
-
-            $ocrResult = \App\Services\OcrService::verifyKtm($path, $nim, $name);
-            $status = ($ocrResult['is_match'] && $ocrResult['is_valid_ktm']) ? 'aktif' : 'menunggu_verifikasi';
-            
-            $data['status'] = $status;
-
-            if ($status === 'aktif') {
-                $data['rejection_reason'] = null;
-            }
         }
 
         $user->update($data);
 
+        if ($request->hasFile('ktm_photo')) {
+            // Picu verifikasi AI di latar belakang (asinkron)
+            \App\Jobs\VerifyKtmJob::dispatch($user, $path, $nim, $name);
+        }
+
         $msg = 'Profil Anda berhasil diperbarui!';
         if ($request->hasFile('ktm_photo')) {
-            $msg = $status === 'aktif' 
-                ? 'Profil diperbarui. KTM Anda terverifikasi oleh AI dan akun Anda aktif!'
-                : 'Profil diperbarui. Namun KTM tidak terverifikasi otomatis oleh AI (' . $ocrResult['reason'] . '). Menunggu verifikasi admin.';
+            $msg = 'Profil diperbarui. KTM Anda sedang diverifikasi oleh AI di latar belakang.';
         }
 
         return response()->json([
