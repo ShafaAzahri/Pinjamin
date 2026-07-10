@@ -15,12 +15,9 @@
         <div class="w-full px-4 sm:px-8 lg:px-12 xl:px-20">
             <div class="flex justify-between h-16 items-center">
                 <!-- Brand -->
-                <div class="flex items-center">
-                    <div class="h-8 w-8 rounded-lg bg-teal-500 flex items-center justify-center text-white font-extrabold text-lg mr-3 shadow-md shadow-teal-500/20">
-                        P
-                    </div>
-                    <span class="text-xl font-black text-slate-800 tracking-tight">PINJAMIN</span>
-                </div>
+                <a href="{{ route('student.catalog') }}" class="flex items-center">
+                    <img src="{{ asset('images/pinjamin-logo.png') }}" alt="PINJAMIN Logo" class="h-10 w-auto">
+                </a>
 
                 <!-- Nav Links -->
                 <div class="hidden sm:flex items-center space-x-1">
