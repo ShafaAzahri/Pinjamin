@@ -62,12 +62,16 @@ class AuthController extends Controller
             'name'      => 'required|string|max:255',
             'email'     => 'required|string|email|max:255|unique:users',
             'password'  => 'required|string|min:8|confirmed',
-            'nim'       => 'required|string|max:50|unique:users',
-            'prodi'     => 'required|string|max:100',
-            'ktm_photo' => 'required|image|max:2048',
+            'nim'       => 'nullable|string|max:50|unique:users',
+            'prodi'     => 'nullable|string|max:100',
+            'ktm_photo' => 'nullable|image|max:2048',
         ]);
 
-        $path = $request->file('ktm_photo')->store('ktm', 'public');
+        $path = null;
+
+        if ($request->hasFile('ktm_photo')) {
+            $path = $request->file('ktm_photo')->store('ktm', 'public');
+        }
 
         $user = User::create([
             'name'      => $request->name,
@@ -80,15 +84,19 @@ class AuthController extends Controller
             'status'    => 'menunggu_verifikasi',
         ]);
 
-        // Picu verifikasi AI di latar belakang (asinkron)
-        \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $request->name);
+        if ($path) {
+            // Picu verifikasi AI di latar belakang (asinkron)
+            \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $request->name);
 
-        // Jalankan queue worker 1x secara otomatis di background (non-blocking)
-        $php = PHP_BINARY;
-        $artisan = base_path('artisan');
-        \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+            // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+            $php = PHP_BINARY;
+            $artisan = base_path('artisan');
+            \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+        }
 
-        $msg = 'Pendaftaran berhasil! KTM Anda sedang diverifikasi oleh AI di latar belakang.';
+        $msg = $path 
+            ? 'Pendaftaran berhasil! KTM Anda sedang diverifikasi oleh AI di latar belakang.'
+            : 'Pendaftaran berhasil! Silakan masuk ke akun Anda dan lengkapi profil.';
 
         return response()->json([
             'message' => $msg,
