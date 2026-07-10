@@ -47,7 +47,7 @@
                 </div>
             @endif
 
-            <form action="/complete-profile" method="POST" enctype="multipart/form-data" class="space-y-5">
+            <form action="{{ url('/complete-profile') }}" method="POST" enctype="multipart/form-data" class="space-y-5">
                 @csrf
                 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -112,7 +112,7 @@
             </form>
             
             <div class="mt-8 pt-8 border-t border-slate-100">
-                <form action="/logout" method="POST">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="w-full text-center text-sm font-bold text-slate-500 hover:text-red-600 transition-colors">
                         Batalkan & Logout
