@@ -31,48 +31,48 @@ class OcrService
             $base64Image = "data:{$mimeType};base64,{$imageData}";
 
             $prompt = "Tolong analisis foto Kartu Tanda Mahasiswa (KTM) ini. Ekstrak NIM dan Nama yang tertera di kartu. "
-                    . "Bandingkan dengan data berikut:\n"
-                    . "- Expected NIM: {$expectedNim}\n"
-                    . "- Expected Name: {$expectedName}\n\n"
-                    . "Perhatikan bahwa nama mungkin disingkat di kartu. "
-                    . "Apakah ini foto KTM yang valid (bukan foto acak)? "
-                    . "Apakah NIM dan Nama di foto sesuai dengan data di atas? "
-                    . "Kembalikan respon hanya dalam format JSON murni (tanpa markdown atau teks tambahan) dengan struktur berikut: "
-                    . '{"is_valid_ktm": true/false, "is_match": true/false, "reason": "penjelasan singkat"}';
+                . "Bandingkan dengan data berikut:\n"
+                . "- Expected NIM: {$expectedNim}\n"
+                . "- Expected Name: {$expectedName}\n\n"
+                . "Perhatikan bahwa nama mungkin disingkat di kartu. "
+                . "Apakah ini foto KTM yang valid (bukan foto acak)? "
+                . "Apakah NIM dan Nama di foto sesuai dengan data di atas? "
+                . "Kembalikan respon hanya dalam format JSON murni (tanpa markdown atau teks tambahan) dengan struktur berikut: "
+                . '{"is_valid_ktm": true/false, "is_match": true/false, "reason": "penjelasan singkat"}';
 
             // Endpoint 9Router Lokal (berdasarkan screenshot)
-            $endpoint = 'http://127.0.0.1:28128/v1/chat/completions';
+            $endpoint = 'http://localhost:20128/v1/chat/completions';
 
             // Kita menggunakan model Gemini yang tersedia di 9Router
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . env('AI_API_KEY', 'dummy-key')
             ])->post($endpoint, [
-                'model' => 'ag/gemini-3-flash', // Model Gemini dari 9Router
-                'messages' => [
-                    [
-                        'role' => 'user',
-                        'content' => [
+                        'model' => 'ag/gemini-3-flash', // Model Gemini dari 9Router
+                        'messages' => [
                             [
-                                'type' => 'text',
-                                'text' => $prompt
-                            ],
-                            [
-                                'type' => 'image_url',
-                                'image_url' => [
-                                    'url' => $base64Image
+                                'role' => 'user',
+                                'content' => [
+                                    [
+                                        'type' => 'text',
+                                        'text' => $prompt
+                                    ],
+                                    [
+                                        'type' => 'image_url',
+                                        'image_url' => [
+                                            'url' => $base64Image
+                                        ]
+                                    ]
                                 ]
                             ]
-                        ]
-                    ]
-                ],
-                'temperature' => 0.1, // Agar AI tidak berhalusinasi
-                'max_tokens' => 300,
-            ]);
+                        ],
+                        'temperature' => 0.1, // Agar AI tidak berhalusinasi
+                        'max_tokens' => 300,
+                    ]);
 
             if ($response->successful()) {
                 $content = $response->json('choices.0.message.content');
-                
+
                 // Bersihkan respon jika AI masih mengembalikan markdown block ```json ... ```
                 $content = preg_replace('/```json/i', '', $content);
                 $content = preg_replace('/```/i', '', $content);
@@ -83,8 +83,8 @@ class OcrService
                 if (json_last_error() === JSON_ERROR_NONE) {
                     return [
                         'is_valid_ktm' => (bool) ($result['is_valid_ktm'] ?? false),
-                        'is_match'     => (bool) ($result['is_match'] ?? false),
-                        'reason'       => $result['reason'] ?? 'Berhasil dianalisis oleh AI.',
+                        'is_match' => (bool) ($result['is_match'] ?? false),
+                        'reason' => $result['reason'] ?? 'Berhasil dianalisis oleh AI.',
                     ];
                 }
             }
@@ -102,8 +102,8 @@ class OcrService
     {
         return [
             'is_valid_ktm' => false,
-            'is_match'     => false,
-            'reason'       => $reason,
+            'is_match' => false,
+            'reason' => $reason,
         ];
     }
 }
