@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\SsoController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\InventoryController;
 use App\Http\Controllers\Admin\LoanController as AdminLoanController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\FineController as AdminFineController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Student\CatalogController;
 use App\Http\Controllers\Student\LoanController as StudentLoanController;
+use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Guest Routes ────────────────────────────────────────
@@ -17,6 +19,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
+
+    // SSO Routes
+    Route::get('/auth/google', [SsoController::class, 'redirectToGoogle'])->name('sso.google');
+    Route::get('/auth/google/callback', [SsoController::class, 'handleGoogleCallback'])->name('sso.google.callback');
 });
 
 // ─── Webhooks ──────────────────────────────────────────────
@@ -24,6 +30,12 @@ Route::post('/webhooks/midtrans', [\App\Http\Controllers\MidtransWebhookControll
 
 // ─── Logout ──────────────────────────────────────────────
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
+
+// ─── Complete Profile (SSO users missing KTM) ──────────────
+Route::middleware(['auth'])->group(function () {
+    Route::get('/complete-profile', [StudentProfileController::class, 'showCompleteProfileForm'])->name('student.complete_profile');
+    Route::post('/complete-profile', [StudentProfileController::class, 'processCompleteProfile']);
+});
 
 // ─── Student Routes ──────────────────────────────────────
 Route::middleware(['auth', 'student'])->group(function () {

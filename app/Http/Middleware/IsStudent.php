@@ -12,6 +12,16 @@ class IsStudent
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->role === 'user' && Auth::user()->status !== 'ditangguhkan') {
+            
+            // Periksa apakah profil sudah lengkap (terutama untuk login via SSO)
+            $user = Auth::user();
+            if (empty($user->nim) || empty($user->ktm_photo)) {
+                // Hindari redirect loop jika sudah berada di halaman complete-profile
+                if (!$request->is('complete-profile') && !$request->is('complete-profile/*')) {
+                    return redirect('/complete-profile')->with('info', 'Harap lengkapi profil Anda terlebih dahulu.');
+                }
+            }
+
             return $next($request);
         }
 
