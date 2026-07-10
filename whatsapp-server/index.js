@@ -18,7 +18,6 @@ const client = new Client({
     authStrategy: new LocalAuth({ dataPath: './whatsapp-session' }),
     puppeteer: {
         headless: true,
-        userDataDir: './chromium-data',
         args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
