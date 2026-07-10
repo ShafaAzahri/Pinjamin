@@ -16,7 +16,7 @@ class WhatsAppService
      */
     public static function send(string $target, string $message): bool
     {
-        $url = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
+        $url = env('WHATSAPP_SERVER_URL', 'http://pinjamin.test/send');
 
         // Format nomor agar diawali kode negara 62
         $formattedTarget = self::formatNumber($target);
