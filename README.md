@@ -1,58 +1,135 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Pinjamin - Sistem Peminjaman Alat Lab
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+  <img src="public/images/pinjamin-logo.png" alt="Pinjamin Logo" width="200">
 </p>
 
-## About Laravel
+**Pinjamin** adalah sebuah platform aplikasi web modern yang dibangun untuk memudahkan mahasiswa dan admin dalam mengelola proses peminjaman peralatan praktikum di Laboratorium (khususnya untuk Politeknik Negeri Semarang / Polines). 
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi ini dibangun menggunakan **Laravel 11**, dilengkapi dengan desain UI modern (Tailwind CSS + Alpine.js), dan memiliki pengalaman navigasi secepat kilat (*Single Page Application*) berkat integrasi **Hotwire Turbo**.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## ✨ Fitur Unggulan
 
-## Learning Laravel
+### 👨‍🎓 Untuk Mahasiswa:
+1. **Google Single Sign-On (SSO):** Login instan tanpa ribet mengingat password menggunakan akun Google (dikhususkan untuk domain `@mhs.polines.ac.id`).
+2. **Katalog Interaktif:** Jelajahi barang, lihat stok *real-time*, dan tambahkan barang ke Keranjang (Cart) layaknya *e-commerce*.
+3. **Navigasi Turbo (SPA):** Perpindahan antar halaman terjadi secara *seamless* tanpa *loading* ulang seluruh halaman (layar putih).
+4. **Pembayaran Denda Otomatis (Midtrans):** Jika terlambat mengembalikan atau barang rusak, denda bisa dibayar langsung menggunakan QRIS/Gopay/Transfer Bank melalui integrasi *Payment Gateway* Midtrans.
+5. **Notifikasi & Status:** Pantau status persetujuan peminjaman, barang aktif, hingga notifikasi pengembalian.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 👨‍💻 Untuk Admin:
+1. **Dashboard Statistik:** Ringkasan jumlah peminjaman aktif, keterlambatan, dan daftar verifikasi mahasiswa baru (KTM).
+2. **Manajemen Inventaris:** Sistem pendataan barang dan unit (*serial number*) yang mendetail. Status barang otomatis berubah saat dipinjam.
+3. **Persetujuan (Approval):** Proses setujui (Approve), tolak (Reject), dan verifikasi pengembalian barang dalam 1 kali klik.
+4. **Sistem Denda Cerdas:** Hitung otomatis durasi keterlambatan berdasarkan jam/hari dan buat tagihan denda otomatis ke mahasiswa.
+5. **Cetak Laporan (PDF):** Cetak laporan riwayat peminjaman dengan filter status yang rapi.
+6. **Pengaturan Sistem:** Atur nilai denda, maksimal hari pinjam, dan maksimal jumlah barang secara dinamis.
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## 📸 Tampilan Layar (Screenshots)
 
-## Agentic Development
+*(Tempatkan gambar Anda di folder `public/docs/` lalu ubah tautan di bawah ini)*
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+| Halaman Login & SSO | Dashboard Admin |
+| :---: | :---: |
+| <img src="public/docs/login.png" width="400" alt="Login"> | <img src="public/docs/admin-dashboard.png" width="400" alt="Admin Dashboard"> |
 
+| Katalog Mahasiswa | Keranjang Peminjaman |
+| :---: | :---: |
+| <img src="public/docs/catalog.png" width="400" alt="Katalog"> | <img src="public/docs/cart.png" width="400" alt="Cart"> |
+
+| Integrasi Pembayaran Midtrans | Manajemen Peminjaman (Admin) |
+| :---: | :---: |
+| <img src="public/docs/midtrans.png" width="400" alt="Midtrans"> | <img src="public/docs/admin-loans.png" width="400" alt="Admin Loans"> |
+
+---
+
+## 💻 Panduan Instalasi (Development)
+
+Berikut adalah panduan untuk menjalankan Pinjamin di komputer lokal Anda (menggunakan **Laragon** atau XAMPP).
+
+### 1. Persyaratan Sistem
+- PHP >= 8.3
+- Composer
+- Node.js & NPM (untuk Tailwind & Vite)
+- Database MySQL atau SQLite
+
+### 2. Kloning Repositori
+Buka terminal dan jalankan:
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/ShafaAzahri/Pinjamin.git
+cd Pinjamin
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 3. Instalasi Dependensi (Backend & Frontend)
+```bash
+composer install
+npm install
+```
 
-## Contributing
+### 4. Pengaturan `.env`
+Salin file konfigurasi:
+```bash
+cp .env.example .env
+```
+Lalu *generate* kunci aplikasi:
+```bash
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Ubah pengaturan database dan URL Anda di dalam file `.env`:
+```env
+APP_URL=http://localhost/Pinjamin/public
 
-## Code of Conduct
+# Jika menggunakan database MySQL:
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=pinjamin
+DB_USERNAME=root
+DB_PASSWORD=
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+# Atau jika ingin praktis pakai SQLite:
+DB_CONNECTION=sqlite
+```
 
-## Security Vulnerabilities
+### 5. Konfigurasi Google SSO (Wajib untuk Login)
+Agar fitur *Login with Google* berfungsi, tambahkan API kredensial dari **Google Cloud Console** Anda ke dalam `.env`:
+```env
+GOOGLE_CLIENT_ID=masukkan_client_id_anda
+GOOGLE_CLIENT_SECRET=masukkan_secret_anda
+GOOGLE_REDIRECT_URI=http://localhost/Pinjamin/public/auth/google/callback
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 6. Migrasi & Seeder Database
+Siapkan tabel dan masukkan akun bawaan (Admin & User):
+```bash
+php artisan migrate:fresh --seed
+```
+*Catatan: Ini akan membuat akun Admin (admin@pinjamin.com / password) dan Student.*
 
-## License
+### 7. Jalankan Server Vite (Untuk CSS & JS)
+Buka tab terminal baru dan jalankan:
+```bash
+npm run dev
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Selesai! Sekarang Anda dapat mengakses aplikasinya melalui web browser pada alamat:
+`http://localhost/Pinjamin/public/`
+
+---
+
+## 🛠 Teknologi yang Digunakan
+- **Framework Utama:** Laravel 11
+- **UI & Styling:** Tailwind CSS 3
+- **Interaktivitas:** Alpine.js
+- **SPA Navigation:** Hotwire Turbo 8
+- **PDF Generator:** Barryvdh/DomPDF
+- **Payment Gateway:** Midtrans Snap
+- **Authentication:** Laravel Socialite (Google SSO)
+
+---
+*Dibuat untuk Tugas / Skripsi Politeknik Negeri Semarang.*
