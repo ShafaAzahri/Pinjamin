@@ -365,15 +365,37 @@ class AdminController extends Controller
      */
     public function verifyUser(Request $request, User $user)
     {
-        $request->validate(['action' => 'required|in:approve,reject']);
+        $request->validate([
+            'action' => 'required|in:approve,reject',
+            'reason' => 'nullable|string'
+        ]);
 
-        $status = $request->action === 'approve' ? 'aktif' : 'ditangguhkan';
-        $user->update(['status' => $status]);
+        if ($request->action === 'approve') {
+            $user->update([
+                'status' => 'aktif',
+                'rejection_reason' => null
+            ]);
+            $msg = "Akun {$user->name} berhasil diverifikasi.";
+        } else {
+            $reason = $request->input('reason', 'Data tidak sesuai atau buram.');
+            $user->update([
+                'status' => 'ditolak',
+                'rejection_reason' => $reason
+            ]);
+            $msg = "Akun {$user->name} ditolak.";
+
+            // Kirim WhatsApp (jika ada nomor HP)
+            if ($user->phone) {
+                $message = "Halo *{$user->name}*,\n\n"
+                         . "Mohon maaf, pendaftaran akun Pinjamin Anda *DITOLAK* oleh Admin.\n\n"
+                         . "Alasan: _{$reason}_\n\n"
+                         . "Silakan mendaftar ulang menggunakan data dan foto KTM yang benar. Terima kasih!";
+                \App\Services\WhatsAppService::sendMessage($user->phone, $message);
+            }
+        }
 
         return response()->json([
-            'message' => $request->action === 'approve'
-                ? "Akun {$user->name} berhasil diverifikasi."
-                : "Akun {$user->name} berhasil ditangguhkan.",
+            'message' => $msg,
         ]);
     }
 

@@ -12,8 +12,8 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
         
-        // If profile is already complete, redirect to catalog
-        if (!empty($user->nim) && !empty($user->ktm_photo)) {
+        // If profile is already complete and NOT rejected, redirect to catalog
+        if (!empty($user->nim) && !empty($user->ktm_photo) && $user->status !== 'ditolak') {
             return redirect('/catalog');
         }
 
@@ -24,8 +24,8 @@ class ProfileController extends Controller
     {
         $user = Auth::user();
 
-        // If profile is already complete, redirect
-        if (!empty($user->nim) && !empty($user->ktm_photo)) {
+        // If profile is already complete and NOT rejected, redirect
+        if (!empty($user->nim) && !empty($user->ktm_photo) && $user->status !== 'ditolak') {
             return redirect('/catalog');
         }
 

@@ -30,6 +30,17 @@
                 Halo, <strong>{{ $user->name }}</strong>! Karena Anda mendaftar melalui SSO Google, kami membutuhkan beberapa data tambahan sebelum Anda dapat meminjam alat.
             </p>
 
+            @if($user->status === 'ditolak')
+                <div class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-100 text-red-800 text-sm font-semibold flex items-start shadow-sm animate-pulse">
+                    <svg class="w-5 h-5 mr-3 mt-0.5 shrink-0 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                    <div>
+                        <span class="font-bold text-red-900">Pendaftaran Ditolak Admin:</span>
+                        <p class="mt-1 text-slate-700 font-medium">"{{ $user->rejection_reason }}"</p>
+                        <div class="text-[10px] text-red-600 mt-2 font-bold uppercase tracking-wider">Silakan perbarui data & unggah ulang KTM yang valid</div>
+                    </div>
+                </div>
+            @endif
+
             @if(session('info'))
                 <div class="mb-6 p-4 rounded-2xl bg-blue-50 border border-blue-100 text-blue-800 text-sm font-semibold flex items-center shadow-sm">
                     <svg class="w-5 h-5 mr-3 shrink-0 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -54,13 +65,13 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label for="nim" class="block text-sm font-bold text-slate-700 mb-2">NIM</label>
-                        <input type="text" id="nim" name="nim" value="{{ old('nim') }}" required 
+                        <input type="text" id="nim" name="nim" value="{{ old('nim', $user->nim) }}" required 
                             class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-white placeholder-slate-400 font-medium shadow-sm"
                             placeholder="Contoh: 3.32.22.0.12">
                     </div>
                     <div>
                         <label for="prodi" class="block text-sm font-bold text-slate-700 mb-2">Program Studi</label>
-                        <input type="text" id="prodi" name="prodi" value="{{ old('prodi') }}" required 
+                        <input type="text" id="prodi" name="prodi" value="{{ old('prodi', $user->prodi) }}" required 
                             class="w-full px-5 py-3.5 rounded-2xl border border-slate-200 focus:outline-none focus:border-teal-600 focus:ring-4 focus:ring-teal-500/10 transition duration-200 text-slate-800 bg-white placeholder-slate-400 font-medium shadow-sm"
                             placeholder="Contoh: Teknik Informatika">
                     </div>

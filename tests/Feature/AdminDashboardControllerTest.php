@@ -141,6 +141,6 @@ class AdminDashboardControllerTest extends TestCase
         ]);
 
         $response->assertRedirect('/admin/users/verification');
-        $this->assertDatabaseMissing('users', ['id' => $pendingUser->id]);
+        $this->assertEquals('ditolak', $pendingUser->fresh()->status);
     }
 }
