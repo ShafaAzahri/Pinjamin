@@ -89,9 +89,13 @@ class AdminDashboardControllerTest extends TestCase
         $response = $this->get('/admin/dashboard');
         $response->assertStatus(200);
         $response->assertSee('John Student'); // Active student
-        $response->assertSee('Pending Student'); // Pending student listed
-        $response->assertSee('pending@student.polines.ac.id');
         $response->assertSee('10.000'); // Fines display
+
+        // Unverified student should not be visible on Dashboard now, but visible on Verification page
+        $response = $this->get('/admin/users/verification');
+        $response->assertStatus(200);
+        $response->assertSee('Pending Student');
+        $response->assertSee('pending@student.polines.ac.id');
     }
 
     public function test_admin_can_approve_pending_user()
@@ -109,11 +113,11 @@ class AdminDashboardControllerTest extends TestCase
 
         $this->actingAs($this->admin);
 
-        $response = $this->post("/admin/users/{$pendingUser->id}/verify", [
+        $response = $this->from('/admin/users/verification')->post("/admin/users/{$pendingUser->id}/verify", [
             'action' => 'approve',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/admin/users/verification');
         $this->assertEquals('aktif', $pendingUser->fresh()->status);
     }
 
@@ -132,11 +136,11 @@ class AdminDashboardControllerTest extends TestCase
 
         $this->actingAs($this->admin);
 
-        $response = $this->post("/admin/users/{$pendingUser->id}/verify", [
+        $response = $this->from('/admin/users/verification')->post("/admin/users/{$pendingUser->id}/verify", [
             'action' => 'reject',
         ]);
 
-        $response->assertRedirect('/admin/dashboard');
+        $response->assertRedirect('/admin/users/verification');
         $this->assertDatabaseMissing('users', ['id' => $pendingUser->id]);
     }
 }

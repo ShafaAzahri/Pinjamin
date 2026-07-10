@@ -38,6 +38,17 @@ class DashboardController extends WebApiController
         ));
     }
 
+    public function verificationList(Request $request)
+    {
+        $pendingUsers = User::where('role', 'user')
+            ->where('status', 'menunggu_verifikasi')
+            ->orderBy('created_at', 'desc')
+            ->paginate(15)
+            ->withQueryString();
+
+        return view('admin.verification.index', compact('pendingUsers'));
+    }
+
     public function verifyUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
@@ -49,9 +60,9 @@ class DashboardController extends WebApiController
 
         if ($request->input('action') === 'reject') {
             $user->delete(); // maintain original delete-on-reject behavior
-            return redirect('/admin/dashboard')->with('success', "Pendaftaran mahasiswa {$user->name} ditolak dan akun dihapus.");
+            return back()->with('success', "Pendaftaran mahasiswa {$user->name} ditolak dan akun dihapus.");
         }
 
-        return redirect('/admin/dashboard')->with('success', $response['message'] ?? 'Status berhasil diubah.');
+        return back()->with('success', $response['message'] ?? 'Status berhasil diubah.');
     }
 }

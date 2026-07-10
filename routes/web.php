@@ -55,6 +55,7 @@ Route::middleware(['auth', 'student'])->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/users/verification', [DashboardController::class, 'verificationList'])->name('users.verification');
     Route::post('/users/{id}/verify', [DashboardController::class, 'verifyUser'])->name('users.verify');
 
     // Inventory Management

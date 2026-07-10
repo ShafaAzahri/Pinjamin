@@ -34,6 +34,22 @@
                     Dashboard
                 </a>
 
+                <a href="/admin/users/verification" 
+                    class="flex items-center px-4 py-3 rounded-xl transition duration-150 font-medium text-sm {{ request()->is('admin/users/verification*') ? 'bg-teal-700/20 text-teal-400 border border-teal-500/20' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                    </svg>
+                    Verifikasi Akun
+                    @php
+                        $pendingVerificationCount = \App\Models\User::where('role', 'user')->where('status', 'menunggu_verifikasi')->count();
+                    @endphp
+                    @if($pendingVerificationCount > 0)
+                        <span class="ml-auto bg-teal-500 text-slate-900 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                            {{ $pendingVerificationCount }}
+                        </span>
+                    @endif
+                </a>
+
                 <a href="/admin/inventory" 
                     class="flex items-center px-4 py-3 rounded-xl transition duration-150 font-medium text-sm {{ request()->is('admin/inventory*') ? 'bg-teal-700/20 text-teal-400 border border-teal-500/20' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent' }}">
                     <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
