@@ -103,4 +103,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+
+    // WhatsApp Gateway
+    Route::get('/whatsapp', [SettingController::class, 'whatsapp'])->name('whatsapp.index');
 });

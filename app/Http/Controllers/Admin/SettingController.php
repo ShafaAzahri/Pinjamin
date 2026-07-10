@@ -36,4 +36,12 @@ class SettingController extends WebApiController
 
         return back()->with('error', $response['message'] ?? 'Gagal memperbarui pengaturan.');
     }
+
+    public function whatsapp()
+    {
+        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
+        $whatsappBaseUrl = str_replace('/send', '', $whatsappUrl);
+        
+        return view('admin.settings.whatsapp', compact('whatsappBaseUrl'));
+    }
 }

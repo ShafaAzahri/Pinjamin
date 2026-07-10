@@ -29,25 +29,29 @@ const client = new Client({
     }
 });
 
+let lastQr = null;
+
 // Event saat QR Code perlu dipindai
 client.on('qr', (qr) => {
     console.log('=========================================');
     console.log('Scan QR Code di bawah ini menggunakan WhatsApp Anda:');
     qrcode.generate(qr, { small: true });
     console.log('=========================================');
+    lastQr = qr;
 });
 
 // Event saat client berhasil terhubung dan siap
 client.on('ready', () => {
     console.log('✅ WhatsApp Client is ready!');
     isClientReady = true;
+    lastQr = null;
 });
 
 // Event saat client terputus
 client.on('disconnected', (reason) => {
     console.log('❌ WhatsApp Client was disconnected', reason);
     isClientReady = false;
-    // Client otomatis mencoba reconnect atau Anda bisa destroy dan init ulang
+    lastQr = null;
 });
 
 // Mulai client
@@ -60,6 +64,41 @@ app.get('/', (req, res) => {
         message: 'WhatsApp Web API Gateway is running',
         isReady: isClientReady
     });
+});
+
+// Endpoint untuk status lengkap (digunakan di Laravel Admin Dashboard)
+app.get('/status', (req, res) => {
+    res.json({
+        status: 'success',
+        isReady: isClientReady,
+        qr: lastQr ? `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(lastQr)}` : null
+    });
+});
+
+// Endpoint untuk memutuskan koneksi WhatsApp
+app.post('/disconnect', async (req, res) => {
+    try {
+        if (isClientReady) {
+            await client.logout();
+            isClientReady = false;
+            lastQr = null;
+            return res.json({
+                status: 'success',
+                message: 'WhatsApp disconnected successfully.'
+            });
+        }
+        return res.status(400).json({
+            status: 'error',
+            message: 'WhatsApp Client is not connected.'
+        });
+    } catch (error) {
+        console.error('Error disconnecting:', error);
+        return res.status(500).json({
+            status: 'error',
+            message: 'Failed to disconnect WhatsApp Client.',
+            error: error.message
+        });
+    }
 });
 
 // Endpoint untuk mengirim pesan

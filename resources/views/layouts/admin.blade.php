@@ -77,6 +77,14 @@
                     </svg>
                     Pengaturan
                 </a>
+
+                <a href="/admin/whatsapp" 
+                    class="flex items-center px-4 py-3 rounded-xl transition duration-150 font-medium text-sm {{ request()->is('admin/whatsapp*') ? 'bg-teal-700/20 text-teal-400 border border-teal-500/20' : 'hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-transparent' }}">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    WhatsApp Gateway
+                </a>
             </nav>
         </div>
 
