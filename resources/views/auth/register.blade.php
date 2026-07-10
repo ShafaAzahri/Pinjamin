@@ -11,7 +11,7 @@
 <body class="min-h-full flex font-sans antialiased">
     
     <!-- Left: Branding (Hidden on mobile) -->
-    <div class="hidden lg:flex lg:w-5/12 bg-slate-50 flex-col items-center justify-center p-12 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
+    <div class="hidden lg:flex lg:w-1/2 bg-slate-50 flex-col items-center justify-center p-12 relative overflow-hidden lg:sticky lg:top-0 lg:h-screen">
         <!-- Decoration -->
         <div class="absolute inset-0 bg-gradient-to-br from-teal-50 to-slate-100 opacity-90"></div>
         <div class="absolute -top-32 -right-32 w-96 h-96 bg-teal-200/50 rounded-full blur-3xl mix-blend-multiply"></div>
@@ -26,7 +26,7 @@
     </div>
 
     <!-- Right: Form -->
-    <div class="w-full lg:w-7/12 flex items-center justify-center bg-white p-6 sm:p-12 min-h-screen shadow-[-20px_0_40px_rgba(0,0,0,0.02)] z-10">
+    <div class="w-full lg:w-1/2 flex items-center justify-center bg-white p-6 sm:p-12 min-h-screen shadow-[-20px_0_40px_rgba(0,0,0,0.02)] z-10">
         <div class="w-full max-w-xl">
             
             <!-- Mobile Logo -->
