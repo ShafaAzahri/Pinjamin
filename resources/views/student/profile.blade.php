@@ -132,12 +132,49 @@
                 </div>
 
                 @if($user->status !== 'aktif' || !$user->ktm_photo)
-                    <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4 pt-2">
+                    <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data" class="space-y-4 pt-2"
+                        x-data="{ 
+                            imageUrl: null,
+                            fileName: '',
+                            fileChosen(event) {
+                                const file = event.target.files[0];
+                                if (file) {
+                                    this.fileName = file.name;
+                                    const reader = new FileReader();
+                                    reader.onload = (e) => {
+                                        this.imageUrl = e.target.result;
+                                    };
+                                    reader.readAsDataURL(file);
+                                } else {
+                                    this.imageUrl = null;
+                                    this.fileName = '';
+                                }
+                            }
+                        }">
                         @csrf
                         <div class="space-y-2">
                             <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Unggah Foto KTM Baru</label>
-                            <input type="file" name="ktm_photo" accept="image/*" required 
-                                class="w-full text-xs text-slate-500 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100 file:transition">
+                            
+                            <label for="ktm_photo_profile" class="mt-1 flex flex-col justify-center items-center px-6 pt-5 pb-6 border-2 border-slate-200 border-dashed rounded-2xl hover:border-teal-500 transition-all bg-slate-50/50 cursor-pointer min-h-[160px] relative">
+                                <input id="ktm_photo_profile" name="ktm_photo" type="file" accept="image/*" class="sr-only" required @change="fileChosen">
+                                
+                                <div x-show="imageUrl" class="absolute inset-0 p-2 flex flex-col items-center justify-center bg-white rounded-2xl z-10" style="display: none;">
+                                    <img :src="imageUrl" class="max-h-[120px] rounded-xl object-contain shadow-sm">
+                                    <p class="text-xs text-slate-500 mt-2 font-semibold" x-text="fileName"></p>
+                                    <span class="text-[10px] text-teal-600 hover:underline mt-1 font-bold">Ubah foto KTM</span>
+                                </div>
+
+                                <div x-show="!imageUrl" class="space-y-1 text-center">
+                                    <svg class="mx-auto h-12 w-12 text-slate-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <div class="flex text-sm text-slate-600 justify-center">
+                                        <span class="font-bold text-teal-700 hover:text-teal-800">Unggah berkas foto KTM</span>
+                                    </div>
+                                    <p class="text-xs text-slate-400">PNG, JPG, JPEG sampai dengan 2MB</p>
+                                </div>
+                            </label>
+                            
                             <p class="text-[10px] text-slate-400 font-semibold mt-0.5">Unggah ulang jika KTM sebelumnya buram atau ditolak Admin.</p>
                         </div>
                         <div class="flex justify-end">

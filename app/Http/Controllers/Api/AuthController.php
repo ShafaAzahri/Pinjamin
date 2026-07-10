@@ -138,19 +138,25 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'name'          => 'required|string|max:255',
-            'email'         => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'name'          => 'sometimes|required|string|max:255',
+            'email'         => 'sometimes|required|string|email|max:255|unique:users,email,' . $user->id,
             'phone'         => 'nullable|string|max:20',
             'password'      => 'nullable|string|min:8|confirmed',
             'profile_photo' => 'nullable|image|max:2048',
             'ktm_photo'     => 'nullable|image|max:2048',
         ]);
 
-        $data = [
-            'name'  => $request->name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-        ];
+        $data = [];
+        
+        if ($request->has('name')) {
+            $data['name'] = $request->name;
+        }
+        if ($request->has('email')) {
+            $data['email'] = $request->email;
+        }
+        if ($request->has('phone')) {
+            $data['phone'] = $request->phone;
+        }
 
         if ($request->filled('password')) {
             $data['password'] = Hash::make($request->password);

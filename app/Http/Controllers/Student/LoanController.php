@@ -103,13 +103,23 @@ class LoanController extends WebApiController
 
     public function updateProfile(Request $request)
     {
-        $data = [
-            'name'                  => $request->input('name'),
-            'email'                 => $request->input('email'),
-            'phone'                 => $request->input('phone'),
-            'password'              => $request->input('password'),
-            'password_confirmation' => $request->input('password_confirmation'),
-        ];
+        $data = [];
+        
+        if ($request->has('name')) {
+            $data['name'] = $request->input('name');
+        }
+        if ($request->has('email')) {
+            $data['email'] = $request->input('email');
+        }
+        if ($request->has('phone')) {
+            $data['phone'] = $request->input('phone');
+        }
+        if ($request->has('password')) {
+            $data['password'] = $request->input('password');
+        }
+        if ($request->has('password_confirmation')) {
+            $data['password_confirmation'] = $request->input('password_confirmation');
+        }
 
         if ($request->hasFile('profile_photo')) {
             $data['profile_photo'] = $request->file('profile_photo');
