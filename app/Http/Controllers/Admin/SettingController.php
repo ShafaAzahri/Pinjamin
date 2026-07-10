@@ -47,30 +47,49 @@ class SettingController extends WebApiController
 
     public function startWhatsapp()
     {
+        \Log::info('Mencoba menyalakan server WhatsApp...');
+
         // Cek apakah port 3000 sudah terpakai
         $connection = @fsockopen('127.0.0.1', 3000);
         if (is_resource($connection)) {
             fclose($connection);
+            \Log::warning('Gagal menyalakan server WA: Port 3000 sudah terpakai.');
             return back()->with('success', 'Server WhatsApp sudah berjalan.');
         }
 
         $path = base_path('whatsapp-server');
+        \Log::info('Directory target WhatsApp:', ['path' => $path]);
 
         // Ganti working directory PHP sementara ke folder whatsapp-server
         $oldPath = getcwd();
         chdir($path);
 
-        if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-            // Windows: Jalankan node index.js di background secara terpisah
-            pclose(popen("start /B node index.js", "r"));
-        } else {
-            // Linux/macOS
-            exec("node index.js > /dev/null 2>&1 &");
+        try {
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                // Windows: Jalankan node index.js di background dan redirect output ke log file
+                // Kita gunakan cmd /c agar output redirection (>) bekerja
+                $cmd = 'start /B cmd /c "node index.js > whatsapp.log 2>&1"';
+                \Log::info("Menjalankan perintah Windows: {$cmd}");
+                $handle = popen($cmd, "r");
+                if ($handle === false) {
+                    \Log::error('Gagal menjalankan popen pada Windows.');
+                } else {
+                    pclose($handle);
+                    \Log::info('Berhasil memicu popen pada Windows.');
+                }
+            } else {
+                // Linux/macOS
+                $cmd = "node index.js > whatsapp.log 2>&1 &";
+                \Log::info("Menjalankan perintah Linux: {$cmd}");
+                exec($cmd);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Exception saat menyalakan server WA: ' . $e->getMessage());
         }
 
         // Kembalikan working directory PHP ke semula
         chdir($oldPath);
 
-        return back()->with('success', 'Server WhatsApp berhasil dinyalakan di latar belakang.');
+        return back()->with('success', 'Server WhatsApp sedang dinyalakan di latar belakang.');
     }
 }
