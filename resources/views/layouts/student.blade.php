@@ -38,12 +38,28 @@
                         @endif
                     </a>
                     <a href="{{ route('student.loans') }}" 
-                        class="px-4 py-2 rounded-xl text-sm font-semibold transition {{ request()->is('loans*') ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
+                        class="px-4 py-2 rounded-xl text-sm font-semibold transition relative {{ request()->is('loans*') ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
                         Peminjaman
+                        @php
+                            $activeLoansCount = \App\Models\Loan::where('user_id', Auth::id())->whereNotIn('status', ['selesai', 'ditolak'])->count();
+                        @endphp
+                        @if($activeLoansCount > 0)
+                            <span class="absolute -top-1 -right-1 h-5 w-5 bg-teal-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                                {{ $activeLoansCount }}
+                            </span>
+                        @endif
                     </a>
                     <a href="{{ route('student.fines') }}" 
-                        class="px-4 py-2 rounded-xl text-sm font-semibold transition {{ request()->is('fines*') ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
+                        class="px-4 py-2 rounded-xl text-sm font-semibold transition relative {{ request()->is('fines*') ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
                         Denda
+                        @php
+                            $unpaidFinesCount = \App\Models\Fine::whereHas('loan', function($q) { $q->where('user_id', Auth::id()); })->whereIn('status', ['belum_lunas', 'menunggu_verifikasi'])->count();
+                        @endphp
+                        @if($unpaidFinesCount > 0)
+                            <span class="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm">
+                                {{ $unpaidFinesCount }}
+                            </span>
+                        @endif
                     </a>
                     <a href="{{ route('student.notifications') }}" 
                         class="px-4 py-2 rounded-xl text-sm font-semibold transition relative {{ request()->is('notifications*') ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50' }}">
@@ -108,11 +124,27 @@
                 </svg>
                 <span class="text-[10px] block text-center mt-0.5 font-semibold">Keranjang</span>
             </a>
-            <a href="{{ route('student.loans') }}" class="p-2 {{ request()->is('loans*') ? 'text-teal-600' : 'text-slate-400' }}">
+            <a href="{{ route('student.loans') }}" class="p-2 relative {{ request()->is('loans*') ? 'text-teal-600' : 'text-slate-400' }}">
                 <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 <span class="text-[10px] block text-center mt-0.5 font-semibold">Pinjaman</span>
+                @if($activeLoansCount > 0)
+                    <span class="absolute top-1 right-2 h-4 w-4 bg-teal-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm border border-white">
+                        {{ $activeLoansCount }}
+                    </span>
+                @endif
+            </a>
+            <a href="{{ route('student.fines') }}" class="p-2 relative {{ request()->is('fines*') ? 'text-teal-600' : 'text-slate-400' }}">
+                <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span class="text-[10px] block text-center mt-0.5 font-semibold">Denda</span>
+                @if($unpaidFinesCount > 0)
+                    <span class="absolute top-1 right-2 h-4 w-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center shadow-sm border border-white">
+                        {{ $unpaidFinesCount }}
+                    </span>
+                @endif
             </a>
             <a href="{{ route('student.notifications') }}" class="p-2 relative {{ request()->is('notifications*') ? 'text-teal-600' : 'text-slate-400' }}">
                 <svg class="w-6 h-6 mx-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
