@@ -97,9 +97,10 @@ class CatalogController extends Controller
         $maxDuration = (int) (Setting::where('key', 'max_loan_duration')->first()?->value ?? 8);
         $maxDurationType = Setting::where('key', 'max_loan_duration_type')->first()?->value ?? 'hours';
 
-        if (count($request->item_unit_ids) > $maxItems) {
-            return response()->json(['message' => "Maksimal {$maxItems} barang dapat dipinjam sekaligus."], 422);
-        }
+        $currentlyBorrowedItemsCount = \App\Models\LoanItem::whereHas('loan', function ($q) {
+            $q->where('user_id', Auth::id())
+              ->whereIn('status', ['menunggu_persetujuan', 'aktif', 'terlambat']);
+        })->count();
 
         // Convert both to hours for comparison
         $requestedHours = $request->loan_duration_type === 'days' ? $request->loan_duration * 24 : $request->loan_duration;
@@ -110,13 +111,15 @@ class CatalogController extends Controller
             return response()->json(['message' => "Total durasi peminjaman maksimal {$maxLabel}."], 422);
         }
 
-        // Check for active loans
-        $activeLoans = Loan::where('user_id', Auth::id())
-            ->whereIn('status', ['menunggu_persetujuan', 'aktif', 'terlambat'])
-            ->count();
+        $requestedItemsCount = count($request->item_unit_ids);
+        $totalItems = $currentlyBorrowedItemsCount + $requestedItemsCount;
 
-        if ($activeLoans > 0) {
-            return response()->json(['message' => 'Anda masih memiliki peminjaman aktif. Selesaikan terlebih dahulu.'], 422);
+        if ($totalItems > $maxItems) {
+            $message = "Batas peminjaman maksimal adalah {$maxItems} barang.";
+            if ($currentlyBorrowedItemsCount > 0) {
+                $message .= " Anda saat ini belum mengembalikan {$currentlyBorrowedItemsCount} barang.";
+            }
+            return response()->json(['message' => $message], 422);
         }
 
         // Validate all units are available
