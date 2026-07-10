@@ -44,6 +44,7 @@ class LoanWorkflowTest extends TestCase
             'status' => 'aktif',
             'nim' => '3.32.22.0.12',
             'prodi' => 'Teknik Elektro',
+            'ktm_photo' => 'ktm.jpg',
         ]);
 
         $this->category = Category::create([

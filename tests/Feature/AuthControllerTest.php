@@ -70,6 +70,8 @@ class AuthControllerTest extends TestCase
             'password' => bcrypt('password'),
             'role' => 'user',
             'status' => 'aktif',
+            'nim' => '12345',
+            'ktm_photo' => 'ktm.jpg',
         ]);
 
         $admin = User::create([
@@ -110,6 +112,8 @@ class AuthControllerTest extends TestCase
             'password' => bcrypt('password123'),
             'role' => 'user',
             'status' => 'aktif',
+            'nim' => '12345',
+            'ktm_photo' => 'ktm.jpg',
         ]);
 
         $profilePhoto = UploadedFile::fake()->create('profile.jpg', 100, 'image/jpeg');
