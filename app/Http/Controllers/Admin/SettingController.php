@@ -11,7 +11,7 @@ class SettingController extends WebApiController
     public function index()
     {
         $response = $this->callApi('GET', '/api/admin/settings');
-        
+
         $settings = Setting::orderBy('key')->get()->keyBy('key');
         return view('admin.settings.index', compact('settings'));
     }
@@ -19,15 +19,19 @@ class SettingController extends WebApiController
     public function update(Request $request)
     {
         $request->validate([
-            'max_loan_duration'      => 'required|integer|min:1',
+            'max_loan_duration' => 'required|integer|min:1',
             'max_loan_duration_type' => 'required|in:hours,days',
-            'fine_amount'            => 'required|integer|min:0|max:1000000',
-            'fine_type'              => 'required|in:per_hour,per_day',
-            'max_items_borrowed'     => 'required|integer|min:1|max:10',
+            'fine_amount' => 'required|integer|min:0|max:1000000',
+            'fine_type' => 'required|in:per_hour,per_day',
+            'max_items_borrowed' => 'required|integer|min:1|max:10',
         ]);
 
         $response = $this->callApi('PUT', '/api/admin/settings', $request->only([
-            'max_loan_duration', 'max_loan_duration_type', 'fine_amount', 'fine_type', 'max_items_borrowed'
+            'max_loan_duration',
+            'max_loan_duration_type',
+            'fine_amount',
+            'fine_type',
+            'max_items_borrowed'
         ]));
 
         if (isset($response['message'])) {
@@ -39,9 +43,9 @@ class SettingController extends WebApiController
 
     public function whatsapp()
     {
-        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
+        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://pinjamin.test/send');
         $whatsappBaseUrl = str_replace('/send', '', $whatsappUrl);
-        
+
         return view('admin.settings.whatsapp', compact('whatsappBaseUrl'));
     }
 
@@ -49,9 +53,12 @@ class SettingController extends WebApiController
     {
         \Log::info('Mencoba menyalakan server WhatsApp...');
 
-        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://localhost:3000/send');
+        $whatsappUrl = env('WHATSAPP_SERVER_URL', 'http://pinjamin.test/send');
         $parsedUrl = parse_url($whatsappUrl);
         $host = $parsedUrl['host'] ?? '127.0.0.1';
+        if ($host === 'pinjamin.test' || $host === 'localhost') {
+            $host = '127.0.0.1';
+        }
         $port = $parsedUrl['port'] ?? 3000;
 
         // Cek apakah port server WhatsApp sudah terpakai

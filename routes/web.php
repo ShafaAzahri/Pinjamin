@@ -11,6 +11,7 @@ use App\Http\Controllers\Student\CatalogController;
 use App\Http\Controllers\Student\LoanController as StudentLoanController;
 use App\Http\Controllers\Student\ProfileController as StudentProfileController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Http;
 
 // ─── Guest Routes ────────────────────────────────────────
 Route::middleware('guest')->group(function () {
@@ -108,3 +109,32 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/whatsapp', [SettingController::class, 'whatsapp'])->name('whatsapp.index');
     Route::post('/whatsapp/start', [SettingController::class, 'startWhatsapp'])->name('whatsapp.start');
 });
+
+// ─── WhatsApp Gateway Proxy Routes ──────────────────────────
+Route::get('/status', function () {
+    try {
+        $response = Http::timeout(3)->get('http://localhost:3000/status');
+        return response()->json($response->json(), $response->status());
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Node server offline'], 503);
+    }
+});
+
+Route::post('/disconnect', function () {
+    try {
+        $response = Http::timeout(3)->post('http://localhost:3000/disconnect');
+        return response()->json($response->json(), $response->status());
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Node server offline'], 503);
+    }
+});
+
+Route::post('/send', function (\Illuminate\Http\Request $request) {
+    try {
+        $response = Http::timeout(5)->post('http://localhost:3000/send', $request->all());
+        return response()->json($response->json(), $response->status());
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'Node server offline'], 503);
+    }
+});
+
