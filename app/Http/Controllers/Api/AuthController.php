@@ -88,10 +88,14 @@ class AuthController extends Controller
             // Picu verifikasi AI di latar belakang (asinkron)
             \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $request->name);
 
-            // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+            // Jalankan queue worker 1x secara otomatis di background (non-blocking & detached)
             $php = (new \Symfony\Component\Process\PhpExecutableFinder())->find(false) ?: 'php';
             $artisan = base_path('artisan');
-            \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                pclose(popen("start /B \"\" \"{$php}\" \"{$artisan}\" queue:work --once", "r"));
+            } else {
+                exec("\"{$php}\" \"{$artisan}\" queue:work --once > /dev/null 2>&1 &");
+            }
         }
 
         $msg = $path 
@@ -178,11 +182,17 @@ class AuthController extends Controller
         }
 
         if ($request->hasFile('profile_photo')) {
+            if ($user->profile_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->profile_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo);
+            }
             $path = $request->file('profile_photo')->store('profiles', 'public');
             $data['profile_photo'] = $path;
         }
 
         if ($request->hasFile('ktm_photo')) {
+            if ($user->ktm_photo && \Illuminate\Support\Facades\Storage::disk('public')->exists($user->ktm_photo)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->ktm_photo);
+            }
             $path = $request->file('ktm_photo')->store('ktm', 'public');
             $data['ktm_photo'] = $path;
 
@@ -200,10 +210,14 @@ class AuthController extends Controller
             // Picu verifikasi AI di latar belakang (asinkron)
             \App\Jobs\VerifyKtmJob::dispatch($user, $path, $nim, $name);
 
-            // Jalankan queue worker 1x secara otomatis di background (non-blocking)
+            // Jalankan queue worker 1x secara otomatis di background (non-blocking & detached)
             $php = (new \Symfony\Component\Process\PhpExecutableFinder())->find(false) ?: 'php';
             $artisan = base_path('artisan');
-            \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
+            if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+                pclose(popen("start /B \"\" \"{$php}\" \"{$artisan}\" queue:work --once", "r"));
+            } else {
+                exec("\"{$php}\" \"{$artisan}\" queue:work --once > /dev/null 2>&1 &");
+            }
         }
 
         $msg = 'Profil Anda berhasil diperbarui!';

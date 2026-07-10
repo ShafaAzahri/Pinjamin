@@ -20,6 +20,8 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'webhooks/midtrans',
+            'send',
+            'disconnect',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

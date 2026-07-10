@@ -36,6 +36,12 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middl
 Route::middleware(['auth'])->group(function () {
     Route::get('/complete-profile', [StudentProfileController::class, 'showCompleteProfileForm'])->name('student.complete_profile');
     Route::post('/complete-profile', [StudentProfileController::class, 'processCompleteProfile']);
+    Route::get('/profile/status', function() {
+        return response()->json([
+            'status' => auth()->user()->status,
+            'rejection_reason' => auth()->user()->rejection_reason,
+        ]);
+    })->name('student.profile.status');
 });
 
 // ─── Student Routes ──────────────────────────────────────

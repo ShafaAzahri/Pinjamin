@@ -25,3 +25,7 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+/public/whatsapp-session
+/whatsapp-server/.wwebjs_cache
+/whatsapp-server/node_modules

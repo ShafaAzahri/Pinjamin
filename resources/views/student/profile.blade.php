@@ -124,6 +124,36 @@
                         <div class="rounded-2xl overflow-hidden border border-slate-100 bg-slate-50 relative aspect-[1.6/1] max-w-sm mx-auto shadow-sm">
                             <img src="{{ asset('storage/' . $user->ktm_photo) }}" class="h-full w-full object-cover">
                         </div>
+                        <div class="max-w-sm mx-auto">
+                            @if($user->status === 'menunggu_verifikasi')
+                                <div class="p-3 bg-amber-50 rounded-2xl border border-amber-100 flex items-center gap-2.5 justify-center shadow-sm">
+                                    <span class="relative flex h-2.5 w-2.5">
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                                    </span>
+                                    <span class="text-xs font-black text-amber-800">Sedang Diverifikasi oleh AI / Admin</span>
+                                </div>
+                            @elseif($user->status === 'aktif')
+                                <div class="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 flex items-center gap-2 justify-center shadow-sm">
+                                    <svg class="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                    <span class="text-xs font-black text-emerald-800">KTM Terverifikasi & Aktif</span>
+                                </div>
+                            @elseif($user->status === 'ditolak')
+                                <div class="p-3 bg-red-50 rounded-2xl border border-red-100 text-center space-y-1.5 shadow-sm">
+                                    <div class="flex items-center gap-2 justify-center">
+                                        <span class="h-2 w-2 rounded-full bg-red-500"></span>
+                                        <span class="text-xs font-black text-red-800">Verifikasi Ditolak</span>
+                                    </div>
+                                    @if($user->rejection_reason)
+                                        <p class="text-[11px] text-red-700 font-bold bg-red-100/30 p-2 rounded-xl border border-red-100/50 leading-relaxed text-left">
+                                            Alasan: {{ $user->rejection_reason }}
+                                        </p>
+                                    @endif
+                                </div>
+                            @endif
+                        </div>
                     @else
                         <div class="rounded-2xl border border-dashed border-slate-200 p-8 text-center text-slate-400 text-xs max-w-sm mx-auto">
                             Belum mengunggah foto KTM
@@ -239,4 +269,22 @@
 
     </div>
 </div>
+
+@if($user->status === 'menunggu_verifikasi')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const intervalId = setInterval(function() {
+            fetch("{{ route('student.profile.status') }}")
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status !== 'menunggu_verifikasi') {
+                        clearInterval(intervalId);
+                        window.location.reload();
+                    }
+                })
+                .catch(err => console.error('Error checking verification status:', err));
+        }, 3000); // Check every 3 seconds
+    });
+</script>
+@endif
 @endsection

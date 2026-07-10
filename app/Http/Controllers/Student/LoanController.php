@@ -131,8 +131,8 @@ class LoanController extends WebApiController
 
         $response = $this->callApi('PUT', '/api/auth/profile', $data);
 
-        if (isset($response['message']) && str_contains($response['message'], 'berhasil')) {
-            return back()->with('success', 'Profil Anda berhasil diperbarui!');
+        if (isset($response['message']) && (str_contains($response['message'], 'berhasil') || str_contains($response['message'], 'diperbarui'))) {
+            return back()->with('success', $response['message']);
         }
 
         return back()->with('error', $response['message'] ?? 'Gagal memperbarui profil.');

@@ -15,7 +15,7 @@ class IsStudent
             
             // Periksa apakah profil sudah lengkap (terutama untuk login via SSO)
             $user = Auth::user();
-            if (empty($user->nim) || empty($user->ktm_photo) || $user->status === 'ditolak') {
+            if (empty($user->nim) || empty($user->ktm_photo)) {
                 // Hindari redirect loop jika sudah berada di halaman complete-profile
                 if (!$request->is('complete-profile') && !$request->is('complete-profile/*')) {
                     return redirect()->route('student.complete_profile')->with('info', 'Harap perbarui KTM dan data profil Anda.');

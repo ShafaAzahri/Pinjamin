@@ -15,6 +15,17 @@ class AuthControllerTest extends TestCase
     public function test_student_registration_requires_ktm_and_sets_pending_status()
     {
         Storage::fake('public');
+        \Illuminate\Support\Facades\Http::fake([
+            '*' => \Illuminate\Support\Facades\Http::response([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => '{"is_valid_ktm": false, "is_match": false, "reason": "Terjadi kesalahan saat memproses gambar dengan AI."}'
+                        ]
+                    ]
+                ]
+            ], 500)
+        ]);
 
         // Use create() instead of image() to avoid GD extension dependency
         $ktmFile = UploadedFile::fake()->create('ktm.jpg', 100, 'image/jpeg');

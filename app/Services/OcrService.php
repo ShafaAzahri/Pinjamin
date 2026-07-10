@@ -19,14 +19,14 @@ class OcrService
     public static function verifyKtm(string $imagePath, string $expectedNim, string $expectedName): array
     {
         try {
-            // Read image and encode to base64
-            $fullPath = storage_path('app/public/' . $imagePath);
-            if (!file_exists($fullPath)) {
+            // Read image and encode to base64 using Laravel Storage
+            if (!Storage::disk('public')->exists($imagePath)) {
                 return self::defaultFalse('File foto KTM tidak ditemukan.');
             }
 
-            $imageData = base64_encode(file_get_contents($fullPath));
-            $mimeType = mime_content_type($fullPath) ?: 'image/jpeg';
+            $imageData = base64_encode(Storage::disk('public')->get($imagePath));
+            $fullPath = Storage::disk('public')->path($imagePath);
+            $mimeType = @mime_content_type($fullPath) ?: 'image/jpeg';
 
             $base64Image = "data:{$mimeType};base64,{$imageData}";
 
@@ -47,7 +47,7 @@ class OcrService
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . env('AI_API_KEY', 'dummy-key')
-            ])->post($endpoint, [
+            ])->timeout(90)->post($endpoint, [
                         'model' => 'oc/mimo-v2.5-free', // Model Gemini dari 9Router
                         'messages' => [
                             [

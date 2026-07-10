@@ -404,7 +404,7 @@ class AdminController extends Controller
                          . "Mohon maaf, pendaftaran akun Pinjamin Anda *DITOLAK* oleh Admin.\n\n"
                          . "Alasan: _{$reason}_\n\n"
                          . "Silakan mendaftar ulang menggunakan data dan foto KTM yang benar. Terima kasih!";
-                \App\Services\WhatsAppService::sendMessage($user->phone, $message);
+                \App\Services\WhatsAppService::send($user->phone, $message);
             }
         }
 
