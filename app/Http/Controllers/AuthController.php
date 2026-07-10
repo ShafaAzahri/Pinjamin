@@ -10,7 +10,7 @@ class AuthController extends WebApiController
     public function showLogin()
     {
         if (Auth::check()) {
-            return Auth::user()->role === 'admin' ? redirect('/admin/dashboard') : redirect('/catalog');
+            return Auth::user()->role === 'admin' ? redirect()->route('admin.dashboard') : redirect()->route('student.catalog');
         }
         return view('auth.login');
     }
@@ -31,8 +31,8 @@ class AuthController extends WebApiController
             $request->session()->regenerate();
 
             return $user->role === 'admin' 
-                ? redirect()->intended('/admin/dashboard') 
-                : redirect()->intended('/catalog');
+                ? redirect()->intended(route('admin.dashboard')) 
+                : redirect()->intended(route('student.catalog'));
         }
 
         return back()->withErrors([
@@ -43,7 +43,7 @@ class AuthController extends WebApiController
     public function showRegister()
     {
         if (Auth::check()) {
-            return Auth::user()->role === 'admin' ? redirect('/admin/dashboard') : redirect('/catalog');
+            return Auth::user()->role === 'admin' ? redirect()->route('admin.dashboard') : redirect()->route('student.catalog');
         }
         return view('auth.register');
     }
@@ -60,7 +60,7 @@ class AuthController extends WebApiController
         $response = $this->callApi('POST', '/api/auth/register', $data);
 
         if (isset($response['user'])) {
-            return redirect('/login')->with('success', $response['message']);
+            return redirect()->route('login')->with('success', $response['message']);
         }
 
         return back()->withErrors($response['errors'] ?? ['email' => $response['message'] ?? 'Pendaftaran gagal.'])->withInput();
@@ -73,6 +73,6 @@ class AuthController extends WebApiController
         }
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/login');
+        return redirect()->route('login');
     }
 }

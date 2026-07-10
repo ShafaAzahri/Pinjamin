@@ -21,7 +21,7 @@ class SsoController extends Controller
             
             // Filter hanya mengizinkan email kampus (@mhs.polines.ac.id)
             if (!str_ends_with($googleUser->getEmail(), '@mhs.polines.ac.id')) {
-                return redirect('/login')->withErrors(['email' => 'Gagal login. Anda harus menggunakan email kampus (@mhs.polines.ac.id).']);
+                return redirect()->route('login')->withErrors(['email' => 'Gagal login. Anda harus menggunakan email kampus (@mhs.polines.ac.id).']);
             }
 
             // Check if user exists by provider_id or email
@@ -49,10 +49,10 @@ class SsoController extends Controller
 
             Auth::login($user, true);
 
-            return redirect()->intended('/catalog');
+            return redirect()->intended(route('student.catalog'));
 
         } catch (\Exception $e) {
-            return redirect('/login')->withErrors(['email' => 'Gagal login menggunakan Google. Silakan coba lagi.']);
+            return redirect()->route('login')->withErrors(['email' => 'Gagal login menggunakan Google. Silakan coba lagi.']);
         }
     }
 }
