@@ -31,8 +31,6 @@ Aplikasi ini dibangun menggunakan **Laravel 11**, dilengkapi dengan desain UI mo
 
 ## 📸 Tampilan Layar (Screenshots)
 
-*(Tempatkan gambar Anda di folder `public/docs/` lalu ubah tautan di bawah ini)*
-
 | Halaman Login & SSO | Dashboard Admin |
 | :---: | :---: |
 | <img src="public/docs/login.png" width="400" alt="Login"> | <img src="public/docs/admin-dashboard.png" width="400" alt="Admin Dashboard"> |
