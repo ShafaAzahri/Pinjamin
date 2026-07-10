@@ -69,6 +69,10 @@ class AuthController extends Controller
 
         $path = $request->file('ktm_photo')->store('ktm', 'public');
 
+        // OCR Verification via 9Router
+        $ocrResult = \App\Services\OcrService::verifyKtm($path, $request->nim, $request->name);
+        $status = ($ocrResult['is_match'] && $ocrResult['is_valid_ktm']) ? 'aktif' : 'menunggu_verifikasi';
+
         $user = User::create([
             'name'      => $request->name,
             'email'     => $request->email,
@@ -77,11 +81,15 @@ class AuthController extends Controller
             'nim'       => $request->nim,
             'prodi'     => $request->prodi,
             'ktm_photo' => $path,
-            'status'    => 'menunggu_verifikasi',
+            'status'    => $status,
         ]);
 
+        $msg = $status === 'aktif' 
+            ? 'Pendaftaran berhasil! KTM Anda terverifikasi oleh AI dan akun Anda sudah aktif.' 
+            : 'Pendaftaran berhasil! Namun KTM tidak terverifikasi otomatis oleh AI (' . $ocrResult['reason'] . '). Akun menunggu verifikasi admin.';
+
         return response()->json([
-            'message' => 'Pendaftaran berhasil! Akun Anda sedang menunggu verifikasi KTM oleh Admin.',
+            'message' => $msg,
             'user'    => [
                 'id'    => $user->id,
                 'name'  => $user->name,
