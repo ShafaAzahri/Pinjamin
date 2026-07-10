@@ -7,6 +7,7 @@
     <title>@yield('title', 'Beranda') - Pinjamin</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script type="module" src="https://cdn.skypack.dev/@hotwired/turbo"></script>
 </head>
 <body class="h-full flex flex-col font-sans antialiased bg-slate-50">
 
