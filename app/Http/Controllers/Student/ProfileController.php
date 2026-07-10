@@ -49,7 +49,7 @@ class ProfileController extends Controller
         \App\Jobs\VerifyKtmJob::dispatch($user, $path, $request->nim, $user->name);
 
         // Jalankan queue worker 1x secara otomatis di background (non-blocking)
-        $php = PHP_BINARY;
+        $php = (new \Symfony\Component\Process\PhpExecutableFinder())->find(false) ?: 'php';
         $artisan = base_path('artisan');
         \Illuminate\Support\Facades\Process::start("\"{$php}\" \"{$artisan}\" queue:work --once");
 
