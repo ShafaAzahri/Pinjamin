@@ -67,12 +67,31 @@ class OcrService
                             ]
                         ],
                         'temperature' => 0.1, // Agar AI tidak berhalusinasi
-                        'max_tokens' => 300,
+                        'max_tokens' => 2000, // Diperbesar karena model Gemini agent menggunakan reasoning tokens
+                        'stream' => false,    // Wajib dimatikan agar respon tidak berbentuk 'data: ...'
                     ]);
 
             if ($response->successful()) {
-                $content = $response->json('choices.0.message.content');
-
+                $body = $response->body();
+                
+                // Jika server memaksa return stream (SSE), kita ekstrak isinya
+                if (str_contains($body, 'data: {"id"')) {
+                    $content = '';
+                    $lines = explode("\n", $body);
+                    foreach ($lines as $line) {
+                        if (str_starts_with($line, 'data: ')) {
+                            $jsonStr = substr($line, 6);
+                            if (trim($jsonStr) === '[DONE]') continue;
+                            $chunk = json_decode($jsonStr, true);
+                            if (isset($chunk['choices'][0]['delta']['content'])) {
+                                $content .= $chunk['choices'][0]['delta']['content'];
+                            }
+                        }
+                    }
+                } else {
+                    $content = $response->json('choices.0.message.content');
+                }
+                
                 // Bersihkan respon jika AI masih mengembalikan markdown block ```json ... ```
                 $content = preg_replace('/```json/i', '', $content);
                 $content = preg_replace('/```/i', '', $content);
