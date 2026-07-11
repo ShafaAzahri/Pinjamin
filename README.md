@@ -1,88 +1,88 @@
-# 🚀 Pinjamin - Sistem Peminjaman Alat Lab
+# 🚀 Pinjamin - Laboratory Equipment Loan System
 
 <p align="center">
   <img src="public/images/pinjamin-logo.png" alt="Pinjamin Logo" width="200">
 </p>
 
-**Pinjamin** adalah sebuah platform aplikasi web modern yang dibangun untuk memudahkan mahasiswa dan admin dalam mengelola proses peminjaman peralatan praktikum di Laboratorium (khususnya untuk Politeknik Negeri Semarang / Polines). 
+**Pinjamin** is a modern web application platform built to facilitate students and administrators in managing the borrowing process of laboratory practicum equipment (specifically for Semarang State Polytechnic / Polines). 
 
-Aplikasi ini dibangun menggunakan **Laravel 11**, dilengkapi dengan desain UI modern (Tailwind CSS + Alpine.js), dan memiliki pengalaman navigasi secepat kilat (*Single Page Application*) berkat integrasi **Hotwire Turbo**.
-
----
-
-## ✨ Fitur Unggulan
-
-### 👨‍🎓 Untuk Mahasiswa:
-1. **Google Single Sign-On (SSO):** Login instan tanpa ribet mengingat password menggunakan akun Google (dikhususkan untuk domain `@mhs.polines.ac.id`).
-2. **Katalog Interaktif:** Jelajahi barang, lihat stok *real-time*, dan tambahkan barang ke Keranjang (Cart) layaknya *e-commerce*.
-3. **Navigasi Turbo (SPA):** Perpindahan antar halaman terjadi secara *seamless* tanpa *loading* ulang seluruh halaman (layar putih).
-4. **Pembayaran Denda Otomatis (Midtrans):** Jika terlambat mengembalikan atau barang rusak, denda bisa dibayar langsung menggunakan QRIS/Gopay/Transfer Bank melalui integrasi *Payment Gateway* Midtrans.
-5. **Notifikasi & Status:** Pantau status persetujuan peminjaman, barang aktif, hingga notifikasi pengembalian.
-
-### 👨‍💻 Untuk Admin:
-1. **Dashboard Statistik:** Ringkasan jumlah peminjaman aktif, keterlambatan, dan daftar verifikasi mahasiswa baru (KTM).
-2. **Manajemen Inventaris:** Sistem pendataan barang dan unit (*serial number*) yang mendetail. Status barang otomatis berubah saat dipinjam.
-3. **Persetujuan (Approval):** Proses setujui (Approve), tolak (Reject), dan verifikasi pengembalian barang dalam 1 kali klik.
-4. **Sistem Denda Cerdas:** Hitung otomatis durasi keterlambatan berdasarkan jam/hari dan buat tagihan denda otomatis ke mahasiswa.
-5. **Cetak Laporan (PDF):** Cetak laporan riwayat peminjaman dengan filter status yang rapi.
-6. **Pengaturan Sistem:** Atur nilai denda, maksimal hari pinjam, dan maksimal jumlah barang secara dinamis.
+The application is built using **Laravel 11**, styled with a modern UI (Tailwind CSS + Alpine.js), and offers a lightning-fast navigation experience (*Single Page Application*) thanks to the integration of **Hotwire Turbo**.
 
 ---
 
-## 📸 Tampilan Layar (Screenshots)
+## ✨ Key Features
 
-| Halaman Login & SSO | Dashboard Admin |
+### 👨‍🎓 For Students:
+1. **Google Single Sign-On (SSO):** Instant login without the hassle of remembering passwords using Google accounts (restricted to the `@mhs.polines.ac.id` domain).
+2. **Interactive Catalog:** Browse items, view real-time stock availability, and add items to the Cart just like an e-commerce platform.
+3. **Turbo Navigation (SPA):** Seamless transitions between pages without reloading the entire page (no white screen flashes).
+4. **Automated Fine Payment (Midtrans):** Fines for late returns or damaged items can be paid directly using QRIS, GoPay, or Bank Transfer through the integrated Midtrans Payment Gateway.
+5. **Notifications & Status:** Monitor loan approval statuses, active borrow items, and return reminders.
+
+### 👨‍💻 For Administrators:
+1. **Statistics Dashboard:** Summary of active loans, overdue items, and a verification queue for new student registrations (ID/KTM).
+2. **Inventory Management:** Detailed tracking of items and individual units (including serial numbers). Item availability status updates automatically upon lending.
+3. **Approval Flow:** Single-click approval, rejection, and return verification.
+4. **Smart Fine System:** Automatic calculation of late returns based on hourly or daily rates, with auto-generated billing sent directly to students.
+5. **PDF Reports:** Export neat PDF reports of borrowing history with filterable status criteria.
+6. **System Settings:** Dynamically configure fine amounts, maximum loan durations, and item borrow limits.
+
+---
+
+## 📸 Screenshots
+
+| Login & SSO Page | Admin Dashboard |
 | :---: | :---: |
 | <img src="public/docs/login.png" width="400" alt="Login"> | <img src="public/docs/admin-dashboard.png" width="400" alt="Admin Dashboard"> |
 
-| Katalog Mahasiswa | Keranjang Peminjaman |
+| Student Catalog | Borrowing Cart |
 | :---: | :---: |
 | <img src="public/docs/catalog.png" width="400" alt="Katalog"> | <img src="public/docs/cart.png" width="400" alt="Cart"> |
 
-| Integrasi Pembayaran Midtrans | Manajemen Peminjaman (Admin) |
+| Midtrans Payment Integration | Loan Management (Admin) |
 | :---: | :---: |
 | <img src="public/docs/midtrans.png" width="400" alt="Midtrans"> | <img src="public/docs/admin-loans.png" width="400" alt="Admin Loans"> |
 
 ---
 
-## 💻 Panduan Instalasi (Development)
+## 💻 Installation Guide (Development)
 
-Berikut adalah panduan untuk menjalankan Pinjamin di komputer lokal Anda (menggunakan **Laragon** atau XAMPP).
+Here is a guide to run Pinjamin on your local machine (using **Laragon** or XAMPP).
 
-### 1. Persyaratan Sistem
+### 1. System Requirements
 - PHP >= 8.3
 - Composer
-- Node.js & NPM (untuk Tailwind & Vite)
-- Database MySQL atau SQLite
+- Node.js & NPM (for Tailwind & Vite)
+- MySQL or SQLite Database
 
-### 2. Kloning Repositori
-Buka terminal dan jalankan:
+### 2. Clone the Repository
+Open your terminal and run:
 ```bash
 git clone https://github.com/ShafaAzahri/Pinjamin.git
 cd Pinjamin
 ```
 
-### 3. Instalasi Dependensi (Backend & Frontend)
+### 3. Install Dependencies (Backend & Frontend)
 ```bash
 composer install
 npm install
 ```
 
-### 4. Pengaturan `.env`
-Salin file konfigurasi:
+### 4. Configure `.env`
+Copy the environment template file:
 ```bash
 cp .env.example .env
 ```
-Lalu *generate* kunci aplikasi:
+Then, generate the application key:
 ```bash
 php artisan key:generate
 ```
 
-Ubah pengaturan database dan URL Anda di dalam file `.env`:
+Configure your database and application URL in the `.env` file:
 ```env
 APP_URL=http://pinjamin.test
 
-# Jika menggunakan database MySQL:
+# If using MySQL:
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
@@ -90,44 +90,44 @@ DB_DATABASE=pinjamin
 DB_USERNAME=root
 DB_PASSWORD=
 
-# Atau jika ingin praktis pakai SQLite:
+# Alternatively, if you want to use SQLite:
 DB_CONNECTION=sqlite
 ```
 
-### 5. Konfigurasi Google SSO (Wajib untuk Login)
-Agar fitur *Login with Google* berfungsi, tambahkan API kredensial dari **Google Cloud Console** Anda ke dalam `.env`:
+### 5. Configure Google SSO (Required for Login)
+To enable the *Login with Google* feature, add your credentials from the **Google Cloud Console** to your `.env` file:
 ```env
-GOOGLE_CLIENT_ID=masukkan_client_id_anda
-GOOGLE_CLIENT_SECRET=masukkan_secret_anda
+GOOGLE_CLIENT_ID=your_client_id_here
+GOOGLE_CLIENT_SECRET=your_client_secret_here
 GOOGLE_REDIRECT_URI=http://pinjamin.test/auth/google/callback
 ```
 
-### 6. Migrasi & Seeder Database
-Siapkan tabel dan masukkan akun bawaan (Admin & User):
+### 6. Database Migration & Seeders
+Set up the tables and populate the default accounts (Admin & Student):
 ```bash
 php artisan migrate:fresh --seed
 ```
-*Catatan: Ini akan membuat akun Admin (admin@pinjamin.com / password) dan Student.*
+*Note: This command will generate default admin credentials (admin@pinjamin.com / password) and a sample student account.*
 
-### 7. Jalankan Server Vite (Untuk CSS & JS)
-Buka tab terminal baru dan jalankan:
+### 7. Run Vite Development Server (For CSS & JS)
+Open a new terminal tab and run:
 ```bash
 npm run dev
 ```
 
-Selesai! Sekarang Anda dapat mengakses aplikasinya melalui web browser pada alamat:
+All set! You can now access the application in your browser at:
 `http://pinjamin.test/`
 
 ---
 
-## 🛠 Teknologi yang Digunakan
-- **Framework Utama:** Laravel 11
+## 🛠 Technologies Used
+- **Core Framework:** Laravel 11
 - **UI & Styling:** Tailwind CSS 3
-- **Interaktivitas:** Alpine.js
+- **Interactivity:** Alpine.js
 - **SPA Navigation:** Hotwire Turbo 8
 - **PDF Generator:** Barryvdh/DomPDF
 - **Payment Gateway:** Midtrans Snap
 - **Authentication:** Laravel Sanctum (Core Auth) & Laravel Socialite (Google SSO)
 
 ---
-*Dibuat untuk Tugas / Skripsi Politeknik Negeri Semarang.*
+*Created for Semarang State Polytechnic Project / Thesis.*
